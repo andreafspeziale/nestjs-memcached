@@ -1,0 +1,39 @@
+name: Release
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: [Test]
+    branches: [main]
+    types: [completed]
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18.5.0
+      - name: Git config
+        run: |
+          git config user.name ${{ secrets.CI_GITHUB_USER }}
+          git config user.email ${{ secrets.CI_GITHUB_EMAIL }}
+      - name: Install
+        run: npm ci
+      - name: Build
+        run: npm run build
+      - name: Set registry
+        run: npm config set //registry.npmjs.org/:_authToken ${{ secrets.CI_NPM_TOKEN }}
+      - name: Release
+        run: npm run release
+      - name: Update develop
+        run: |
+          git branch
+          git checkout develop
+          git rebase main
+          git push

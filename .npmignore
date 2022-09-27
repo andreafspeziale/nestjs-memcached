@@ -1,0 +1,12 @@
+/coverage
+.github
+.husky
+/lib
+.eslintrc.js
+.prettierrc
+.release-it.json
+docker-compose.test.yml
+jest.config.js
+package-lock.json
+tsconfig.build.json
+tsconfig.json
