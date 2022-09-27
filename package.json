@@ -1,6 +1,6 @@
 {
   "name": "@andreafspeziale/nestjs-memcached",
-  "version": "1.0.0-rc.0",
+  "version": "1.0.0",
   "description": "A Memcached module and service for Nest - modern, fast, powerful node.js web framework",
   "author": "Andrea Francesco Speziale",
   "private": false,
