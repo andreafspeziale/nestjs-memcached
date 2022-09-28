@@ -1,10 +1,10 @@
 import { Inject } from '@nestjs/common';
-import { getMemcachedOptionsToken, getMemcachedConnectionToken } from './memcached.utils';
+import { getMemcachedClientToken, getMemcachedModuleOptionsToken } from './memcached.utils';
 
-export const InjectMemcachedOptions = (connection?: string): ReturnType<typeof Inject> => {
-  return Inject(getMemcachedOptionsToken(connection));
+export const InjectMemcachedOptions = (): ReturnType<typeof Inject> => {
+  return Inject(getMemcachedModuleOptionsToken());
 };
 
-export const InjectMemcached = (connection?: string): ReturnType<typeof Inject> => {
-  return Inject(getMemcachedConnectionToken(connection));
+export const InjectMemcached = (): ReturnType<typeof Inject> => {
+  return Inject(getMemcachedClientToken());
 };

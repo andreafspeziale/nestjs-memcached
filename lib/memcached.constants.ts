@@ -1,3 +1,2 @@
-export const MEMCACHED_MODULE_CONNECTION = 'default';
-export const MEMCACHED_MODULE_OPTIONS_TOKEN = 'MemcachedModuleOptionsToken';
-export const MEMCACHED_MODULE_CONNECTION_TOKEN = 'MemcachedConnectionToken';
+export const MEMCACHED_MODULE_OPTIONS_TOKEN = 'MEMCACHED_MODULE_OPTIONS';
+export const MEMCACHED_CLIENT_TOKEN = 'MEMCACHED_CLIENT';
