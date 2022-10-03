@@ -1,5 +1,12 @@
 
 
+## [2.0.2](https://github.com/andreafspeziale/nestjs-memcached/compare/2.0.1...2.0.2) (2022-10-03)
+
+
+### Bug Fixes
+
+* readme ([5ad0703](https://github.com/andreafspeziale/nestjs-memcached/commit/5ad0703cc0212c2db9a1b704147f8a0e6f1d2bb0))
+
 ## [2.0.1](https://github.com/andreafspeziale/nestjs-memcached/compare/2.0.0...2.0.1) (2022-10-03)
 
 
