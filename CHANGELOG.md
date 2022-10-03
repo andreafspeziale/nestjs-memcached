@@ -1,5 +1,12 @@
 
 
+## [2.0.1](https://github.com/andreafspeziale/nestjs-memcached/compare/2.0.0...2.0.1) (2022-10-03)
+
+
+### Miscellaneous
+
+* update badges ([ae01b4e](https://github.com/andreafspeziale/nestjs-memcached/commit/ae01b4e8b4f25dffaa284a706f7bdcffb116585f))
+
 ## [2.0.0](https://github.com/andreafspeziale/nestjs-memcached/compare/1.0.0...2.0.0) (2022-10-03)
 
 
