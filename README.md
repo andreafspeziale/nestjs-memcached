@@ -12,6 +12,8 @@
   
   <a href="">[![Test](https://github.com/andreafspeziale/nestjs-memcached/actions/workflows/test.yml/badge.svg)](https://github.com/andreafspeziale/nestjs-memcached/actions/workflows/test.yml)</a>
   <a href="">[![Release](https://github.com/andreafspeziale/nestjs-memcached/actions/workflows/release.yml/badge.svg)](https://github.com/andreafspeziale/nestjs-memcached/actions/workflows/release.yml)</a>
+  <a href="">[![npm version](https://badge.fury.io/js/@andreafspeziale%2Fnestjs-memcached.svg)](https://badge.fury.io/js/@andreafspeziale%2Fnestjs-memcached)</a>
+  <a href="">[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)</a>
 </div>
 
 ## Installation
@@ -19,26 +21,28 @@
 ### npm
 
 ```sh
-npm install @andreafspeziale/nestjs-memcached memjs superjson
+npm install @andreafspeziale/nestjs-memcached memjs @nestjs/common
 ```
 
 ### yarn
 
 ```sh
-yarn add @andreafspeziale/nestjs-memcached memjs superjson
+yarn add @andreafspeziale/nestjs-memcached memjs @nestjs/common
 ```
 
 ### pnpm
 
 ```sh
-pnpm install @andreafspeziale/nestjs-memcached memjs superjson
+pnpm install @andreafspeziale/nestjs-memcached memjs @nestjs/common
 ```
 
 ## How to use?
 
 ### Module
 
-#### MemcachedModule.forRoot(options, connection?)
+The module is <a href="https://docs.nestjs.com/modules#global-modules" target="blank">Global</a> by default.
+
+#### MemcachedModule.forRoot(options)
 
 ```ts
 import { Module } from '@nestjs/common';
@@ -69,7 +73,33 @@ export class AppModule {}
 
 For signle connection without authentication you can omit the `connections` property.
 
-#### MemcachedModule.forRootAsync(options, connection?)
+```ts
+// exploded MemcachedModuleOptions
+export interface MemcachedModuleOptions {
+  // Pair list of server/s and auth
+  connections?: {
+    host: string;
+    port: number;
+    auth?: {
+      user: string;
+      password: string;
+    };
+  }[];
+  // Global key/value pair time to live
+  ttl: number;
+  // Optional global key/value pair time to refresh in order to enable wrapping and refresh-ahead
+  ttr?: number;
+  // Optional global function to wrap the your value with metadata when using setWithMeta API
+  // (default: { content: T; ttl: number; ttr?: number })
+  valueProcessor?: ValueProcessor;
+  // Optional global function to manipulate your cached value key (default: no manipulation)
+  keyProcessor?: KeyProcessor;
+  // Optional global functions to parse the data when using set, setWithMeta, get APIs (default: JSON.stringify/parse)
+  parser?: Parser;
+}
+```
+
+#### MemcachedModule.forRootAsync(options)
 
 ```ts
 import { Module } from '@nestjs/common';
@@ -95,16 +125,17 @@ export class AppModule {}
 
 ### Decorators
 
-#### InjectMemcached(connection?) | InjectMemcachedOptions(connection?)
+#### InjectMemcachedOptions() and InjectMemcached()
 
 ```ts
 import { Injectable } from '@nestjs/common';
-import { InjectMemcached, InjectMemcachedOptions } from '@andreafspeziale/nestjs-memcached';
+import { InjectMemcachedOptions, InjectMemcached } from '@andreafspeziale/nestjs-memcached';
 
 @Injectable()
 export class SampleService {
   constructor(
-    @InjectMemcachedOptions() private readonly memcachedModuleOptions: MemcachedModuleOptions,
+    @InjectMemcachedOptions()
+    private readonly memcachedModuleOptions: MemcachedModuleOptions,
     @InjectMemcached() private readonly memcachedClient: MemcachedClient
   ) {}
 
@@ -126,8 +157,8 @@ export class SampleFacade {
     private readonly memcachedService: MemcachedService
   ) {}
 
-  async sampleMethod(): Promise<SampleReturnType> {
-    const cachedItem = await this.memcachedService.get<CachedItemType>(cachedItemKey);
+  async sampleMethod(): Promise<SampleReturn> {
+    const cachedItem = await this.memcachedService.get<CachedPlainOrWrappedItem>(cachedItemKey);
 
     if(cachedItem === null) {
       ...
@@ -137,7 +168,7 @@ export class SampleFacade {
 }
 ```
 
-You can also set `ttl` and/or `ttr` inline in order to override the global values specified during the `MemcachedModule` import
+You can also set all the proper `Processors` and `CachingOptions` inline in order to override the global values specified during the `MemcachedModule` import
 
 ```ts
     await this.memcachedService.set<string>('key', 'value', { ttl: 100 });
@@ -145,18 +176,37 @@ You can also set `ttl` and/or `ttr` inline in order to override the global value
     await this.memcachedService.set<string>('key', 'value', { ttl: 100, ttr: 50 });
 ```
 
-The provided `MemcachedService` is an opinionated wrapper around `memjs`.
+The provided `MemcachedService` is an opinionated wrapper around `memjs` trying to be unopinionated as much as possibile at the same time.
 
-It enables `refresh-ahead` cache pattern in order to let you add a logical expiration called `ttr (time to refresh)` to the cached data.
+Using `setWithMeta` enables `refresh-ahead` cache pattern in order to let you add a logical expiration called `ttr (time to refresh)` to the cached data and more.
 
 So each time you get some cached data it will contain additional properties in order to help you decide whatever business logic needs to be applied.
 
 ```ts
-export interface CachedValue<T> {
+export interface CachingOptions {
   ttl: number;
   ttr?: number;
-  createdAt: Date;
+}
+
+export interface BaseWrappedValue<T> {
   content: T;
+}
+
+export type WrappedValue<T = unknown, M extends CachingOptions = CachingOptions> = Omit<
+  M,
+  'content'
+> &
+  BaseWrappedValue<T>;
+
+export type ValueProcessor<T = unknown, M extends CachingOptions = CachingOptions> = (
+  p: { value: T } & CachingOptions
+) => WrappedValue<T, M>;
+
+export type KeyProcessor = (key: string) => string;
+
+export interface Parser {
+  stringify<T = unknown>(objectToStringify: T): string;
+  parse<T = unknown>(stringifiedObject: string): T;
 }
 ```
 

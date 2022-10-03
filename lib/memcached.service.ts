@@ -1,36 +1,99 @@
-// eslint-disable-next-line import/no-extraneous-dependencies
-import { stringify, parse } from 'superjson';
 import { Injectable } from '@nestjs/common';
 import { Client as MemcachedClient } from 'memjs';
-import { CachedValue, CachingOptions, MemcachedModuleOptions } from './memcached.interfaces';
-import { toCachedValue } from './memcached.utils';
+import {
+  CachingOptions,
+  MemcachedModuleOptions,
+  Processors,
+  ValueProcessor,
+  Parser,
+  KeyProcessor,
+  WrappedValue,
+} from './memcached.interfaces';
 import { InjectMemcached, InjectMemcachedOptions } from './memcached.decorators';
+import { defaultValueProcessor, defaultKeyProcessor, defaultParser } from './memcached.utils';
 
 @Injectable()
 export class MemcachedService {
+  private readonly valueProcessor: ValueProcessor;
+  private readonly keyProcessor: KeyProcessor;
+  private readonly parser: Parser;
+
   constructor(
-    @InjectMemcachedOptions() private readonly memcachedModuleOptions: MemcachedModuleOptions,
+    @InjectMemcachedOptions()
+    private readonly memcachedModuleOptions: MemcachedModuleOptions,
     @InjectMemcached() private readonly memcachedClient: MemcachedClient
-  ) {}
+  ) {
+    this.valueProcessor = memcachedModuleOptions.valueProcessor
+      ? memcachedModuleOptions.valueProcessor
+      : defaultValueProcessor;
 
-  async set<T>(key: string, value: T, options?: CachingOptions): Promise<CachedValue<T>> {
-    const valueToChache = toCachedValue(
+    this.keyProcessor = memcachedModuleOptions.keyProcessor
+      ? memcachedModuleOptions.keyProcessor
+      : defaultKeyProcessor;
+
+    this.parser = memcachedModuleOptions.parser ? memcachedModuleOptions.parser : defaultParser;
+  }
+
+  async setWithMeta<T = unknown, M extends CachingOptions = CachingOptions>(
+    key: string,
+    value: T,
+    options?: CachingOptions & Processors
+  ): Promise<WrappedValue<T, M>> {
+    const wrapperProcessorPayload = {
       value,
-      options?.ttl || this.memcachedModuleOptions.ttl,
-      options?.ttr || this.memcachedModuleOptions.ttr
-    );
+      ttl: options?.ttl || this.memcachedModuleOptions.ttl,
+      ...(options?.ttr
+        ? { ttr: options?.ttr }
+        : this.memcachedModuleOptions.ttr
+        ? { ttr: this.memcachedModuleOptions.ttr }
+        : {}),
+    };
 
-    await this.memcachedClient.set(key, Buffer.from(stringify(valueToChache)), {
+    const wrappedValue = options?.valueProcessor
+      ? options.valueProcessor(wrapperProcessorPayload)
+      : this.valueProcessor(wrapperProcessorPayload);
+
+    const processedKey = options?.keyProcessor ? options.keyProcessor(key) : this.keyProcessor(key);
+
+    const wrappedValueToCache = options?.parser
+      ? options.parser.stringify(wrappedValue)
+      : this.parser.stringify(wrappedValue);
+
+    await this.memcachedClient.set(processedKey, wrappedValueToCache, {
       expires: options?.ttl,
     });
 
-    return valueToChache;
+    return options?.parser
+      ? options.parser.parse(wrappedValueToCache)
+      : this.parser.parse(wrappedValueToCache);
   }
 
-  async get<T>(key: string): Promise<CachedValue<T> | null> {
-    const cachedValue = (await this.memcachedClient.get(key)).value;
+  async set<T>(
+    key: string,
+    value: T,
+    options?: Pick<CachingOptions, 'ttl'> & Pick<Processors, 'keyProcessor' | 'parser'>
+  ): Promise<boolean> {
+    const processedKey = options?.keyProcessor ? options.keyProcessor(key) : this.keyProcessor(key);
 
-    return cachedValue !== null ? parse(cachedValue.toString()) : (cachedValue as null);
+    const valueWithOrWithoutStereoids = options?.parser
+      ? options.parser.stringify(value)
+      : this.parser.stringify(value);
+
+    return this.memcachedClient.set(processedKey, valueWithOrWithoutStereoids, {
+      expires: options?.ttl || this.memcachedModuleOptions.ttl,
+    });
+  }
+
+  async get<T>(key: string, options?: Omit<Processors, 'valueProcessor'>): Promise<T | null> {
+    const processedKey = options?.keyProcessor ? options.keyProcessor(key) : this.keyProcessor(key);
+
+    const cachedValue = (await this.memcachedClient.get(processedKey)).value;
+
+    return cachedValue !== null
+      ? options?.parser
+        ? options.parser.parse(cachedValue.toString())
+        : this.parser.parse(cachedValue.toString())
+      : (cachedValue as null);
   }
 
   async flush(): Promise<Record<string, boolean>> {

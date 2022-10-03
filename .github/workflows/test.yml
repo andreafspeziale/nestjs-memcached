@@ -12,6 +12,13 @@ jobs:
         image: bitnami/memcached:1.6.17
         ports:
           - 11211:11211
+      memcached-with-auth:
+        image: bitnami/memcached:1.6.17
+        env:
+          MEMCACHED_USERNAME: user
+          MEMCACHED_PASSWORD: password
+        ports:
+          - 11212:11211
     steps:
       - name: Checkout
         uses: actions/checkout@v3
