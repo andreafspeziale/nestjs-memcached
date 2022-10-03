@@ -9,11 +9,11 @@
     <a href="https://memcached.org/" target="blank">Memcached</a> module and service for <a href="https://github.com/nestjs/nest" target="blank">Nest</a>,<br>
     a progressive Node.js framework for building efficient and scalable server-side applications.
   </p>
-  
-  <a href="">[![Test](https://github.com/andreafspeziale/nestjs-memcached/actions/workflows/test.yml/badge.svg)](https://github.com/andreafspeziale/nestjs-memcached/actions/workflows/test.yml)</a>
-  <a href="">[![Release](https://github.com/andreafspeziale/nestjs-memcached/actions/workflows/release.yml/badge.svg)](https://github.com/andreafspeziale/nestjs-memcached/actions/workflows/release.yml)</a>
-  <a href="">[![npm version](https://badge.fury.io/js/@andreafspeziale%2Fnestjs-memcached.svg)](https://badge.fury.io/js/@andreafspeziale%2Fnestjs-memcached)</a>
-  <a href="">[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)</a>
+
+<a href="https://www.npmjs.com/@andreafspeziale/nestjs-memcached" target="_blank"><img src="https://img.shields.io/npm/v/@andreafspeziale/nestjs-memcached.svg" alt="NPM Version" /></a>
+<a href="https://www.npmjs.com/@andreafspeziale/nestjs-memcached" target="_blank"><img src="https://img.shields.io/npm/l/@andreafspeziale/nestjs-memcached.svg" alt="Package License" /></a>
+<a href="https://github.com/andreafspeziale/nestjs-memcached/actions" target="_blank"><img src="https://img.shields.io/github/workflow/status/andreafspeziale/nestjs-memcached/Test" alt="Test Status"/></a>
+
 </div>
 
 ## Installation
