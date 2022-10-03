@@ -21,19 +21,19 @@
 ### npm
 
 ```sh
-npm install @andreafspeziale/nestjs-memcached memjs @nestjs/common
+npm install @andreafspeziale/nestjs-memcached memjs
 ```
 
 ### yarn
 
 ```sh
-yarn add @andreafspeziale/nestjs-memcached memjs @nestjs/common
+yarn add @andreafspeziale/nestjs-memcached memjs
 ```
 
 ### pnpm
 
 ```sh
-pnpm install @andreafspeziale/nestjs-memcached memjs @nestjs/common
+pnpm install @andreafspeziale/nestjs-memcached memjs
 ```
 
 ## How to use?
@@ -89,7 +89,7 @@ export interface MemcachedModuleOptions {
   ttl: number;
   // Optional global key/value pair time to refresh in order to enable wrapping and refresh-ahead
   ttr?: number;
-  // Optional global function to wrap the your value with metadata when using setWithMeta API
+  // Optional global function to wrap your value with metadata when using setWithMeta API
   // (default: { content: T; ttl: number; ttr?: number })
   valueProcessor?: ValueProcessor;
   // Optional global function to manipulate your cached value key (default: no manipulation)
@@ -178,7 +178,7 @@ You can also set all the proper `Processors` and `CachingOptions` inline in orde
 
 The provided `MemcachedService` is an opinionated wrapper around `memjs` trying to be unopinionated as much as possibile at the same time.
 
-Using `setWithMeta` enables `refresh-ahead` cache pattern in order to let you add a logical expiration called `ttr (time to refresh)` to the cached data and more.
+`setWithMeta` enables `refresh-ahead` cache pattern in order to let you add a logical expiration called `ttr (time to refresh)` to the cached data and more.
 
 So each time you get some cached data it will contain additional properties in order to help you decide whatever business logic needs to be applied.
 
