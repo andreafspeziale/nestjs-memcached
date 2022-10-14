@@ -1,5 +1,16 @@
 
 
+## [3.0.0](https://github.com/andreafspeziale/nestjs-memcached/compare/2.0.2...3.0.0) (2022-10-14)
+
+
+### ⚠ BREAKING CHANGES
+
+* remove parser and valueProcessor from configuration
+
+### refactor
+
+* remove parser and valueProcessor from configuration ([8122550](https://github.com/andreafspeziale/nestjs-memcached/commit/8122550b4c5169dceb9c407ccd2c41e363b8ac07))
+
 ## [2.0.2](https://github.com/andreafspeziale/nestjs-memcached/compare/2.0.1...2.0.2) (2022-10-03)
 
 
