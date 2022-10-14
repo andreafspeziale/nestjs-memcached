@@ -1,4 +1,4 @@
-import { Client as MemcachedClient } from 'memjs';
+import * as MemcachedClient from 'memcached';
 import { Injectable } from '@nestjs/common';
 import { InjectMemcached, InjectMemcachedOptions } from '../memcached.decorators';
 import { MemcachedModuleOptions } from '../memcached.interfaces';
