@@ -1,16 +1,8 @@
 version: '3.9'
 
 services:
-  memcached:
-    container_name: memcached
+  cache:
+    container_name: memcached-0
     image: bitnami/memcached:1.6.17
     ports:
       - 11211:11211
-  memcached-with-auth:
-    container_name: memcached-with-auth
-    image: bitnami/memcached:1.6.17
-    environment:
-      - MEMCACHED_USERNAME=user
-      - MEMCACHED_PASSWORD=password
-    ports:
-      - 11212:11211
