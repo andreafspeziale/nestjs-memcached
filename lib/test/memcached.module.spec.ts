@@ -1,8 +1,7 @@
+import * as MemcachedClient from 'memcached';
 import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { Client as MemcachedClient } from 'memjs';
-import { stringify, parse } from 'superjson';
 import {
   MemcachedService,
   MemcachedModule,
@@ -16,23 +15,19 @@ describe('MemcachedService (e2e)', () => {
   (
     [
       {
-        description: 'With auth connection and ttl',
+        description: 'With connection and ttl',
         options: {
           connections: [
             {
               host: 'localhost',
-              port: 11212,
-              auth: {
-                user: 'user',
-                password: 'password',
-              },
+              port: 11211,
             },
           ],
           ttl: 60,
         },
       },
       {
-        description: 'With onlyc ttl',
+        description: 'With only ttl',
         options: {
           ttl: 60,
         },
@@ -42,54 +37,6 @@ describe('MemcachedService (e2e)', () => {
         options: {
           ttl: 60,
           ttr: 30,
-        },
-      },
-      {
-        description: 'With ttl, ttr and parser',
-        options: {
-          ttl: 60,
-          ttr: 30,
-          parser: {
-            stringify,
-            parse,
-          },
-        },
-      },
-      {
-        description: 'With ttl, ttr, parser and valueProcessor',
-        options: {
-          ttl: 60,
-          ttr: 30,
-          parser: {
-            stringify,
-            parse,
-          },
-          // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-          valueProcessor: ({ value, ttl, ttr }) => ({
-            ttl,
-            ...(ttr ? { ttr } : {}),
-            content: value,
-            createdAt: new Date(),
-          }),
-        },
-      },
-      {
-        description: 'With ttl, ttr, parser, valueProcessor and keyProcessor',
-        options: {
-          ttl: 60,
-          ttr: 30,
-          parser: {
-            stringify,
-            parse,
-          },
-          // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-          valueProcessor: ({ value, ttl, ttr }) => ({
-            ttl,
-            ...(ttr ? { ttr } : {}),
-            content: value,
-            createdAt: new Date(),
-          }),
-          keyProcessor: (key: string): string => `prefix::${key}`,
         },
       },
     ] as { [key: string]: unknown; options: MemcachedModuleOptions }[]

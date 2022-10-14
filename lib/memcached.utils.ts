@@ -1,37 +1,23 @@
-import { Client as MemcachedClient } from 'memjs';
+import * as MemcachedClient from 'memcached';
 import { MEMCACHED_MODULE_OPTIONS_TOKEN, MEMCACHED_CLIENT_TOKEN } from './memcached.constants';
-import {
-  KeyProcessor,
-  MemcachedModuleOptions,
-  Parser,
-  ValueProcessor,
-} from './memcached.interfaces';
+import { WrappedValue, CachingOptions, MemcachedModuleOptions } from './memcached.interfaces';
 
 export const getMemcachedModuleOptionsToken = (): string => MEMCACHED_MODULE_OPTIONS_TOKEN;
 export const getMemcachedClientToken = (): string => MEMCACHED_CLIENT_TOKEN;
 
 export const createMemcachedClient = ({
   connections = [],
-  ttl,
 }: Pick<MemcachedModuleOptions, 'connections' | 'ttl'>): MemcachedClient =>
-  MemcachedClient.create(
-    connections
-      .map((c) =>
-        c.auth ? `${c.auth.user}:${c.auth.password}@${c.host}:${c.port}` : `${c.host}:${c.port}`
-      )
-      .join(','),
-    { expires: ttl }
+  new MemcachedClient(
+    connections.map((c) => (c.port ? `${c.host}:${c.port}` : `${c.host}`)).join(',')
   );
 
-export const defaultValueProcessor: ValueProcessor = ({ value, ttl, ttr }) => ({
+export const defaultValueProcessor = <T = unknown>({
+  value,
+  ttl,
+  ttr,
+}: Record<'value', T> & CachingOptions): WrappedValue<T> & CachingOptions => ({
   content: value,
   ttl,
   ...(ttr ? { ttr } : {}),
 });
-
-export const defaultKeyProcessor: KeyProcessor = (key: string): string => key;
-
-export const defaultParser: Parser = {
-  stringify: (objectToStringify) => JSON.stringify(objectToStringify),
-  parse: (stringifiedObject) => JSON.parse(stringifiedObject),
-};
