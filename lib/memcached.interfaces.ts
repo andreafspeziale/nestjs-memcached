@@ -1,4 +1,5 @@
 import { ModuleMetadata, Type } from '@nestjs/common';
+import { stringify, parse } from 'superjson';
 
 export interface CachingOptions {
   ttl: number;
@@ -14,17 +15,40 @@ export interface MemcachedConnections {
   port?: number;
 }
 
-export type ValueProcessor<T = unknown, R = unknown> = (p: { value: T } & CachingOptions) => R;
+export type BaseWrapper<T = unknown> = WrappedValue<T> & CachingOptions;
+
+export type WrapperProcessor<T = unknown, R = BaseWrapper<T>> = (
+  p: { value: T } & CachingOptions
+) => R;
+
 export type KeyProcessor = (key: string) => string;
 
-export interface Processors<T = unknown, R = unknown> {
-  valueProcessor?: ValueProcessor<T, R>;
+export interface Processors<T = unknown, R = BaseWrapper<T>> {
+  wrapperProcessor?: WrapperProcessor<T, R>;
   keyProcessor?: KeyProcessor;
 }
 
-export interface MemcachedModuleOptions extends CachingOptions {
+export interface MemcachedModuleOptions<T = unknown, R = BaseWrapper<T> & Record<string, unknown>>
+  extends CachingOptions,
+    Processors<T, R> {
   connections?: MemcachedConnections[];
-  keyProcessor?: KeyProcessor;
+  superjson?: boolean;
+}
+
+export type SetWithMetaOptions<T = unknown, R = BaseWrapper<T>> = Partial<CachingOptions> &
+  Processors<T, R> &
+  Pick<MemcachedModuleOptions, 'superjson'>;
+
+export type SetOptions = Partial<Pick<CachingOptions, 'ttl'>> &
+  Pick<Processors, 'keyProcessor'> &
+  Pick<MemcachedModuleOptions, 'superjson'>;
+
+export type GetOptions = Pick<Processors, 'keyProcessor'> &
+  Pick<MemcachedModuleOptions, 'superjson'>;
+
+export interface Parser {
+  stringify: typeof stringify;
+  parse: typeof parse;
 }
 
 export interface MemcachedModuleOptionsFactory {

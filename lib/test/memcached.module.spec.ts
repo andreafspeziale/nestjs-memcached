@@ -103,7 +103,7 @@ describe('MemcachedService (e2e)', () => {
 
       it('Should be possible to access MemcachedModuleOptions and MemcachedClient in another provider using forRoot', async () => {
         module = await Test.createTestingModule({
-          imports: [MemcachedModule.forRoot(options)],
+          imports: [MemcachedModule.register(options)],
           providers: [TestService],
         }).compile();
 
@@ -124,7 +124,7 @@ describe('MemcachedService (e2e)', () => {
               isGlobal: true,
               load: [returnConfig],
             }),
-            MemcachedModule.forRootAsync({
+            MemcachedModule.registerAsync({
               useFactory: (configService: ConfigService<ReturnType<typeof returnConfig>>) => ({
                 ...(configService.get('memcached') as MemcachedModuleOptions),
               }),

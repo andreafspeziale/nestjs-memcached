@@ -32,12 +32,14 @@
   ],
   "peerDependencies": {
     "@nestjs/common": "^9.1.2",
-    "memcached": "^2.2.2"
+    "memcached": "^2.2.2",
+    "superjson": "^1.10.1"
   },
   "dependencies": {
     "@nestjs/common": "^9.1.2",
     "bluebird": "3.7.2",
-    "memcached": "^2.2.2"
+    "memcached": "^2.2.2",
+    "superjson": "1.10.1"
   },
   "devDependencies": {
     "@commitlint/cli": "17.1.2",
