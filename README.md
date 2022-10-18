@@ -60,6 +60,14 @@ import { AppController } from './app.controller';
       ],
       ttl: 60,
       ttr: 30,
+      wrapperProcessor: ({ value, ttl, ttr }) => ({
+        content: value,
+        ttl,
+        ...(ttr ? { ttr } : {}),
+        createdAt: new Date(),
+      }),
+      keyProcessor: (key: string): string => `prefix_${key}`,
+      superjson: true,
     }),
   ],
   controllers: [AppController],
@@ -67,25 +75,13 @@ import { AppController } from './app.controller';
 export class AppModule {}
 ```
 
-For signle connection you can omit the `connections` property.
-For multiple connections you can omit the `port` property if the server is using the default one.
-
-```ts
-// exploded MemcachedModuleOptions
-export interface MemcachedModuleOptions {
-  // Pair list of server/s and auth
-  connections?: {
-    host: string;
-    port?: number;
-  }[];
-  // Global key/value pair time to live
-  ttl: number;
-  // Optional global key/value pair time to refresh in order to enable wrapping and refresh-ahead
-  ttr?: number;
-  // Optional global function to manipulate your cached value key (default: no manipulation)
-  keyProcessor?: KeyProcessor;
-}
-```
+- For signle connection you can omit the `connections` property.
+- For multiple connections you can omit the `port` property if the server is using the default one.
+- `ttl` is the global time to live.
+- `ttr` is the global optional time to refresh.
+- `wrapperProcessor` is the global optional wrapper processor function which wraps the value to be cached and adds metadata.
+- `keyProcessor` is the global optional key processor function which process your cache keys.
+- Usally when caching a JS object like `Date` you will get back a `string` from the cache, [superjson](https://github.com/blitz-js/superjson) will `stringify` on cache `sets` adding metadata in order to later `parse` on cache `gets` and retrieve the initial "raw" data.
 
 #### MemcachedModule.forRootAsync(options)
 

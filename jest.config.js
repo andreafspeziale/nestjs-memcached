@@ -8,4 +8,8 @@ module.exports = {
   },
   collectCoverageFrom: ['**/*.(t|j)s'],
   coverageDirectory: '../coverage',
+  coveragePathIgnorePatterns: [
+    '<rootDir>/test/test.service.ts',
+    '<rootDir>/index.ts',
+  ],
 };
