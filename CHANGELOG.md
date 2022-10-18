@@ -1,5 +1,12 @@
 
 
+## [3.1.0](https://github.com/andreafspeziale/nestjs-memcached/compare/3.0.0...3.1.0) (2022-10-18)
+
+
+### Features
+
+* enable global valueProcessor as wrapperProcessor and superjson ([7754844](https://github.com/andreafspeziale/nestjs-memcached/commit/77548449c5d41176a0613efd7af8a9a65d4fe505))
+
 ## [3.0.0](https://github.com/andreafspeziale/nestjs-memcached/compare/2.0.2...3.0.0) (2022-10-14)
 
 
