@@ -1,18 +1,27 @@
 import * as b from 'bluebird';
 import { Injectable } from '@nestjs/common';
 import * as MemcachedClient from 'memcached';
+import { stringify, parse } from 'superjson';
 import {
   CachingOptions,
+  GetOptions,
+  KeyProcessor,
   MemcachedModuleOptions,
-  Processors,
+  SetOptions,
+  SetWithMetaOptions,
+  WrapperProcessor,
   WrappedValue,
+  Parser,
 } from './memcached.interfaces';
 import { InjectMemcached, InjectMemcachedOptions } from './memcached.decorators';
-import { defaultValueProcessor } from './memcached.utils';
+import { defaultWrapperProcessor } from './memcached.utils';
 
 @Injectable()
 export class MemcachedService {
   private readonly client: ReturnType<typeof b.promisifyAll<MemcachedClient>>;
+  private readonly wrapperProcessor: WrapperProcessor;
+  private readonly keyProcessor?: KeyProcessor;
+  private readonly parser: Parser;
 
   constructor(
     @InjectMemcachedOptions()
@@ -20,13 +29,23 @@ export class MemcachedService {
     @InjectMemcached() private readonly memcachedClient: MemcachedClient
   ) {
     this.client = b.promisifyAll(this.memcachedClient);
+
+    this.wrapperProcessor = memcachedModuleOptions.wrapperProcessor
+      ? memcachedModuleOptions.wrapperProcessor
+      : defaultWrapperProcessor;
+
+    this.keyProcessor = memcachedModuleOptions.keyProcessor;
+
+    this.parser = {
+      stringify,
+      parse,
+    };
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-shadow
   async setWithMeta<T, R = WrappedValue<T> & CachingOptions>(
     key: string,
     value: T,
-    options?: Partial<CachingOptions> & Processors<T, R>
+    options?: SetWithMetaOptions<T, R>
   ): Promise<boolean> {
     const ttl = options?.ttl || this.memcachedModuleOptions.ttl;
 
@@ -42,45 +61,55 @@ export class MemcachedService {
 
     const processedKey = options?.keyProcessor
       ? options.keyProcessor(key)
-      : this.memcachedModuleOptions.keyProcessor
-      ? this.memcachedModuleOptions.keyProcessor(key)
+      : this.keyProcessor
+      ? this.keyProcessor(key)
       : key;
 
-    const wrappedValue = options?.valueProcessor
-      ? options.valueProcessor(wrapperProcessorPayload)
-      : defaultValueProcessor<T>(wrapperProcessorPayload);
+    const wrappedValue = options?.wrapperProcessor
+      ? options.wrapperProcessor(wrapperProcessorPayload)
+      : this.wrapperProcessor(wrapperProcessorPayload);
 
-    return this.client.setAsync(processedKey, wrappedValue, ttl);
+    const parsed =
+      options?.superjson || this.memcachedModuleOptions.superjson
+        ? this.parser.stringify(wrappedValue)
+        : wrappedValue;
+
+    return this.client.setAsync(processedKey, parsed, ttl);
   }
 
-  async set<T>(
-    key: string,
-    value: T,
-    options?: Partial<Pick<CachingOptions, 'ttl'>> & Pick<Processors, 'keyProcessor'>
-  ): Promise<boolean> {
+  async set<T>(key: string, value: T, options?: SetOptions): Promise<boolean> {
     const processedKey = options?.keyProcessor
       ? options.keyProcessor(key)
-      : this.memcachedModuleOptions.keyProcessor
-      ? this.memcachedModuleOptions.keyProcessor(key)
+      : this.keyProcessor
+      ? this.keyProcessor(key)
       : key;
+
+    const parsed =
+      options?.superjson || this.memcachedModuleOptions.superjson
+        ? this.parser.stringify(value)
+        : value;
 
     return this.client.setAsync(
       processedKey,
-      value,
+      parsed,
       options?.ttl || this.memcachedModuleOptions.ttl
     );
   }
 
-  async get<T = unknown>(
-    key: string,
-    options?: Pick<Processors, 'keyProcessor'>
-  ): Promise<T | null> {
+  async get<T = unknown>(key: string, options?: GetOptions): Promise<T | null> {
     const processedKey = options?.keyProcessor
       ? options.keyProcessor(key)
-      : this.memcachedModuleOptions.keyProcessor
-      ? this.memcachedModuleOptions.keyProcessor(key)
+      : this.keyProcessor
+      ? this.keyProcessor(key)
       : key;
-    return (await this.client.getAsync(processedKey)) || null;
+
+    const cached: T | undefined = await this.client.getAsync(processedKey);
+
+    return cached
+      ? (options?.superjson || this.memcachedModuleOptions.superjson) && typeof cached === 'string'
+        ? this.parser.parse<T>(cached)
+        : cached
+      : null;
   }
 
   async flush(): Promise<boolean[]> {

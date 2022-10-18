@@ -1,28 +1,44 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
-import { MemcachedService, MemcachedModule, CachingOptions, WrappedValue } from '../';
+import {
+  MemcachedService,
+  MemcachedModule,
+  CachingOptions,
+  WrappedValue,
+  MemcachedModuleOptions,
+} from '../';
 
 describe('MemcachedService (e2e)', () => {
-  [
-    {
-      options: {
-        connections: [
-          {
-            host: 'localhost',
-            port: 11211,
-          },
-        ],
-        ttl: 60,
+  (
+    [
+      {
+        options: {
+          connections: [
+            {
+              host: 'localhost',
+              port: 11211,
+            },
+          ],
+          ttl: 60,
+          superjson: true,
+        },
       },
-    },
-    {
-      options: {
-        ttl: 60,
-        ttr: 30,
-        keyProcessor: (key: string): string => `v_${key}`,
+      {
+        options: {
+          ttl: 60,
+          ttr: 30,
+          // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+          wrapperProcessor: ({ value, ttl, ttr }) => ({
+            content: value,
+            ttl,
+            ...(ttr ? { ttr } : {}),
+            createdAt: new Date(),
+          }),
+          keyProcessor: (key: string): string => `v_${key}`,
+        },
       },
-    },
-  ].forEach(({ options }) =>
+    ] as { [key: string]: unknown; options: MemcachedModuleOptions }[]
+  ).forEach(({ options }) =>
     describe(`Module with options: ${JSON.stringify(options)}`, () => {
       let app: INestApplication;
       let memcachedService: MemcachedService;
@@ -40,28 +56,46 @@ describe('MemcachedService (e2e)', () => {
       });
 
       describe('setWithMeta & get', () => {
-        it('Should return the value of the cached key/value pair along with default', async () => {
+        it('Should return the value of the cached key/value pair along with defaults', async () => {
           const result = await memcachedService.setWithMeta('key', 'value');
 
           expect(result).toBe(true);
 
-          const cached = await memcachedService.get<WrappedValue<string> & CachingOptions>('key');
+          const cached = await memcachedService.get<
+            WrappedValue<string> & { createdAt: Date | string } & CachingOptions
+          >('key');
 
           expect(cached?.ttl).toBe(options.ttl);
           options.ttr ? expect(cached?.ttr).toBe(options.ttr) : expect(cached?.ttr).toBeUndefined();
           expect(cached?.content).toBe('value');
+
+          if (options.wrapperProcessor) {
+            expect(cached?.createdAt).toBeDefined();
+            options.superjson
+              ? expect(cached?.createdAt).toBeInstanceOf(Date)
+              : expect(typeof cached?.createdAt).toBe('string');
+          }
         });
 
-        it('Should return the value of the cached key/value pair along with specified', async () => {
+        it('Should return the value of the cached key/value pair along with specified ttl', async () => {
           const result = await memcachedService.setWithMeta<string>('key', 'value', { ttl: 100 });
 
           expect(result).toBe(true);
 
-          const cached = await memcachedService.get<WrappedValue<string> & CachingOptions>('key');
+          const cached = await memcachedService.get<
+            WrappedValue<string> & { createdAt: Date | string } & CachingOptions
+          >('key');
 
           expect(cached?.ttl).toBe(100);
           options.ttr ? expect(cached?.ttr).toBe(options.ttr) : expect(cached?.ttr).toBeUndefined();
           expect(cached?.content).toBe('value');
+
+          if (options.wrapperProcessor) {
+            expect(cached?.createdAt).toBeDefined();
+            options.superjson
+              ? expect(cached?.createdAt).toBeInstanceOf(Date)
+              : expect(typeof cached?.createdAt).toBe('string');
+          }
         });
 
         it('Should return the value of the cached key/value pair along with specified ttl and ttr', async () => {
@@ -72,21 +106,30 @@ describe('MemcachedService (e2e)', () => {
 
           expect(result).toBe(true);
 
-          const cached = await memcachedService.get<WrappedValue<string> & CachingOptions>('key');
+          const cached = await memcachedService.get<
+            WrappedValue<string> & { createdAt: Date | string } & CachingOptions
+          >('key');
 
           expect(cached?.ttl).toBe(100);
           expect(cached?.ttr).toBe(50);
           expect(cached?.content).toBe('value');
+
+          if (options.wrapperProcessor) {
+            expect(cached?.createdAt).toBeDefined();
+            options.superjson
+              ? expect(cached?.createdAt).toBeInstanceOf(Date)
+              : expect(typeof cached?.createdAt).toBe('string');
+          }
         });
 
-        it('Should return the value of the cached key/value with override valueProcessor', async () => {
+        it('Should return the value of the cached key/value with override wrapperProcessor', async () => {
           const result = await memcachedService.setWithMeta<
             string,
             WrappedValue<string> & { test: string } & CachingOptions
           >('key', 'value', {
             ttl: 100,
             ttr: 50,
-            valueProcessor: ({ value, ttl, ttr }) => ({
+            wrapperProcessor: ({ value, ttl, ttr }) => ({
               content: value,
               ttl,
               ...(ttr ? { ttr } : {}),
@@ -119,30 +162,78 @@ describe('MemcachedService (e2e)', () => {
 
           expect(result).toBe(true);
 
-          const cashed = await memcachedService.get<
-            WrappedValue<typeof data> & { createdAt?: Date } & CachingOptions
+          const cached = await memcachedService.get<
+            WrappedValue<typeof data> & { createdAt: Date | string } & CachingOptions
           >('key');
 
           const {
             content: { property, list, date },
             ...rest
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          } = cashed!;
+          } = cached!;
 
           expect(rest.ttl).toBe(options.ttl);
           options.ttr ? expect(rest.ttr).toBe(options.ttr) : expect(rest.ttr).toBeUndefined();
 
           expect(property).toBe(data.property);
           expect(list).toEqual(data.list);
-          expect(typeof date).toBe('string');
+          options.superjson
+            ? expect(date).toBeInstanceOf(Date)
+            : expect(typeof date).toBe('string');
+
+          if (options.wrapperProcessor) {
+            expect(cached?.createdAt).toBeDefined();
+            options.superjson
+              ? expect(cached?.createdAt).toBeInstanceOf(Date)
+              : expect(typeof cached?.createdAt).toBe('string');
+          }
         });
       });
 
       describe('set & get', () => {
-        it('Should return true when the value of the cached key/value pair is successfully cached', async () => {
-          const cached = await memcachedService.set('key', 'value');
+        it('Should return the value of the cached key/value pair along with default', async () => {
+          const result = await memcachedService.set('key', 'value');
 
-          expect(cached).toBe(true);
+          expect(result).toBe(true);
+
+          const cached = await memcachedService.get('key');
+
+          expect(cached).toBe('value');
+        });
+
+        it('Should return the value of the cached key/value pair as complex object', async () => {
+          const data = {
+            property: 'myProperty',
+            list: [],
+            date: new Date(),
+          };
+
+          const result = await memcachedService.set('key', data);
+
+          expect(result).toBe(true);
+
+          const cached = await memcachedService.get<
+            Omit<typeof data, 'date'> & { date: Date | string }
+          >('key');
+
+          const {
+            property,
+            list,
+            date,
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          } = cached!;
+
+          expect(property).toBe(data.property);
+          expect(list).toEqual(data.list);
+          options.superjson
+            ? expect(date).toBeInstanceOf(Date)
+            : expect(typeof date).toBe('string');
+        });
+
+        it('Should return null', async () => {
+          const cached = await memcachedService.get('key');
+
+          expect(cached).toBe(null);
         });
       });
 
