@@ -44,8 +44,8 @@
     "superjson": "1.10.1"
   },
   "devDependencies": {
-    "@commitlint/cli": "17.1.2",
-    "@commitlint/config-conventional": "17.1.0",
+    "@commitlint/cli": "17.2.0",
+    "@commitlint/config-conventional": "17.2.0",
     "@nestjs/config": "2.2.0",
     "@nestjs/core": "9.2.0",
     "@nestjs/platform-express": "9.1.2",

@@ -1,8 +1,8 @@
 lockfileVersion: 5.4
 
 specifiers:
-  '@commitlint/cli': 17.1.2
-  '@commitlint/config-conventional': 17.1.0
+  '@commitlint/cli': 17.2.0
+  '@commitlint/config-conventional': 17.2.0
   '@nestjs/common': 9.1.6
   '@nestjs/config': 2.2.0
   '@nestjs/core': 9.2.0
@@ -42,8 +42,8 @@ dependencies:
   superjson: 1.10.1
 
 devDependencies:
-  '@commitlint/cli': 17.1.2
-  '@commitlint/config-conventional': 17.1.0
+  '@commitlint/cli': 17.2.0
+  '@commitlint/config-conventional': 17.2.0
   '@nestjs/config': 2.2.0_yjxybkvltbh2d3oivnq5etx3oi
   '@nestjs/core': 9.2.0_tliywf2ubrerg4hdfgb5kbafzq
   '@nestjs/platform-express': 9.1.2_fty2y4okfbb6yewmbo5v65eaam
@@ -409,8 +409,8 @@ packages:
     resolution: {integrity: sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==}
     dev: true
 
-  /@commitlint/cli/17.1.2:
-    resolution: {integrity: sha512-h/4Hlka3bvCLbnxf0Er2ri5A44VMlbMSkdTRp8Adv2tRiklSTRIoPGs7OEXDv3EoDs2AAzILiPookgM4Gi7LOw==}
+  /@commitlint/cli/17.2.0:
+    resolution: {integrity: sha512-kd1zykcrjIKyDRftWW1E1TJqkgzeosEkv1BiYPCdzkb/g/3BrfgwZUHR1vg+HO3qKUb/0dN+jNXArhGGAHpmaQ==}
     engines: {node: '>=v14'}
     hasBin: true
     dependencies:
@@ -429,8 +429,8 @@ packages:
       - '@swc/wasm'
     dev: true
 
-  /@commitlint/config-conventional/17.1.0:
-    resolution: {integrity: sha512-WU2p0c9/jLi8k2q2YrDV96Y8XVswQOceIQ/wyJvQxawJSCasLdRB3kUIYdNjOCJsxkpoUlV/b90ZPxp1MYZDiA==}
+  /@commitlint/config-conventional/17.2.0:
+    resolution: {integrity: sha512-g5hQqRa80f++SYS233dbDSg16YdyounMTAhVcmqtInNeY/GF3aA4st9SVtJxpeGrGmueMrU4L+BBb+6Vs5wrcg==}
     engines: {node: '>=v14'}
     dependencies:
       conventional-changelog-conventionalcommits: 5.0.0
