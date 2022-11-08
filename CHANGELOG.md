@@ -1,5 +1,27 @@
 
 
+## [3.1.4](https://github.com/andreafspeziale/nestjs-memcached/compare/3.1.3...3.1.4) (2022-11-08)
+
+
+### Bug Fixes
+
+* update dependency superjson to v1.11.0 ([31bbdbf](https://github.com/andreafspeziale/nestjs-memcached/commit/31bbdbf0411785afe9705776a74f1c4d472bc7d8))
+* update nest monorepo to v9.2.0 ([64086f3](https://github.com/andreafspeziale/nestjs-memcached/commit/64086f336b4153c276a00cebfaeecae351903ef1))
+
+
+### Miscellaneous
+
+* **deps:** add renovate.json ([4878cc5](https://github.com/andreafspeziale/nestjs-memcached/commit/4878cc5508a1026ffc911ca9094c14dd6e44628f))
+* update commitlint monorepo to v17.2.0 ([49782aa](https://github.com/andreafspeziale/nestjs-memcached/commit/49782aa68a800d37052d8dba5ad76d6358367ea9))
+* update dependency @release-it/conventional-changelog to v5.1.1 ([4910e50](https://github.com/andreafspeziale/nestjs-memcached/commit/4910e50480a7acd265dbf17fbaf1b20db639fbc2))
+* update dependency eslint to v8.27.0 ([804b4f2](https://github.com/andreafspeziale/nestjs-memcached/commit/804b4f255565e138308a10ebe194850ea9feacb8))
+* update dependency husky to v8.0.2 ([0688bea](https://github.com/andreafspeziale/nestjs-memcached/commit/0688beab2dcbd5dd0aa2565e65624591276dcb70))
+* update dependency release-it to v15.5.0 ([a896cac](https://github.com/andreafspeziale/nestjs-memcached/commit/a896cacda1b2edc743b064aa18a76493127dff60))
+* update dependency ts-jest to v29.0.3 ([bc8d303](https://github.com/andreafspeziale/nestjs-memcached/commit/bc8d303a53ff35c53e06006e997960f3e3a7a941))
+* update jest monorepo ([f80e5a4](https://github.com/andreafspeziale/nestjs-memcached/commit/f80e5a42ec866086b8fdf54e405309551fdfefc1))
+* update renovate configuration ([b8fcfad](https://github.com/andreafspeziale/nestjs-memcached/commit/b8fcfad865c7892954abac056230de0617009200))
+* update typescript-eslint monorepo to v5.42.1 ([e558b8e](https://github.com/andreafspeziale/nestjs-memcached/commit/e558b8e1d30c36918c70b12327b7a64e09718895))
+
 ## [3.1.3](https://github.com/andreafspeziale/nestjs-memcached/compare/3.1.2...3.1.3) (2022-11-08)
 
 
