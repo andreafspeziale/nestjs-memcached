@@ -7,6 +7,9 @@
 .release-it.json
 docker-compose.test.yml
 jest.config.js
-package-lock.json
+pnpm-lock.yaml
 tsconfig.build.json
 tsconfig.json
+.vscode
+renovate.json
+.editorconfig
