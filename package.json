@@ -50,7 +50,7 @@
     "@nestjs/core": "9.2.0",
     "@nestjs/platform-express": "9.1.2",
     "@nestjs/testing": "9.1.2",
-    "@release-it/conventional-changelog": "5.1.0",
+    "@release-it/conventional-changelog": "5.1.1",
     "@types/bluebird": "3.5.37",
     "@types/jest": "29.0.3",
     "@types/memcached": "2.2.7",
