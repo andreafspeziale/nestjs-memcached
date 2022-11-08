@@ -1,5 +1,17 @@
 
 
+## [3.2.0](https://github.com/andreafspeziale/nestjs-memcached/compare/3.1.5...3.2.0) (2022-11-08)
+
+
+### Features
+
+* implement increment and decrement api ([a4ebe0d](https://github.com/andreafspeziale/nestjs-memcached/commit/a4ebe0dbd53454b55d58e764e3952a9cbc37a359))
+
+
+### Miscellaneous
+
+* repo structure and tools improvement ([fd89072](https://github.com/andreafspeziale/nestjs-memcached/commit/fd89072ba65fa9c12bdce27053e12aeebd8c2006))
+
 ## [3.1.5](https://github.com/andreafspeziale/nestjs-memcached/compare/3.1.4...3.1.5) (2022-11-08)
 
 
