@@ -1,5 +1,12 @@
 
 
+## [3.1.3](https://github.com/andreafspeziale/nestjs-memcached/compare/3.1.2...3.1.3) (2022-11-08)
+
+
+### Bug Fixes
+
+* github release creation ([1604dc7](https://github.com/andreafspeziale/nestjs-memcached/commit/1604dc7ddbdf0b58b4ffea52ec13a7c976e8a67a))
+
 ## [3.1.2](https://github.com/andreafspeziale/nestjs-memcached/compare/3.1.1...3.1.2) (2022-11-08)
 
 
