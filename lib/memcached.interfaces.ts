@@ -46,6 +46,8 @@ export type SetOptions = Partial<Pick<CachingOptions, 'ttl'>> &
 export type GetOptions = Pick<Processors, 'keyProcessor'> &
   Pick<MemcachedModuleOptions, 'superjson'>;
 
+export type IncrDecrOptions = Pick<Processors, 'keyProcessor'>;
+
 export interface Parser {
   stringify: typeof stringify;
   parse: typeof parse;

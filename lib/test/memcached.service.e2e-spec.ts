@@ -237,6 +237,68 @@ describe('MemcachedService (e2e)', () => {
         });
       });
 
+      describe('incr', () => {
+        it('Should correclty increment the key numeric value', async () => {
+          const incr = 1;
+          const curr = 0;
+
+          await memcachedService.set('key', curr);
+          const result = await memcachedService.incr('key', incr);
+
+          expect(result).toBe(curr + incr);
+        });
+
+        it('Should return false since key has never been set as whatever', async () => {
+          const result = await memcachedService.incr('key', 1);
+
+          expect(result).toBe(false);
+        });
+
+        it('Should throw Error if key value is set but not numeric', async () => {
+          await memcachedService.set('key', 'value');
+
+          await expect(memcachedService.incr('key', 1)).rejects.toThrow(
+            new Error('cannot increment or decrement non-numeric value')
+          );
+        });
+      });
+
+      describe('decr', () => {
+        it('Should correclty decrement the key numeric value', async () => {
+          const decr = 1;
+          const curr = 1;
+
+          await memcachedService.set('key', curr);
+          const result = await memcachedService.decr('key', decr);
+
+          expect(result).toBe(curr - decr);
+        });
+
+        it('Should return 0 if try to decrement from 0', async () => {
+          const decr = 1;
+          const curr = 0;
+
+          await memcachedService.set('key', curr);
+          const result = await memcachedService.decr('key', decr);
+
+          expect(result).toBe(curr);
+        });
+
+        it('Should return false since key has never been set as whatever', async () => {
+          const result = await memcachedService.decr('key', 1);
+
+          expect(result).toBe(false);
+        });
+
+        it('Should throw Error if key value is set but not numeric', async () => {
+          await memcachedService.set('key', 'value');
+
+          await expect(memcachedService.decr('key', 1)).rejects.toThrow(
+            new Error('cannot increment or decrement non-numeric value')
+          );
+        });
+      });
+
       afterEach(async () => {
         await memcachedService.flush();
       });
