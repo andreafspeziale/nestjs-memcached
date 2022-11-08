@@ -1,5 +1,12 @@
 
 
+## [3.1.2](https://github.com/andreafspeziale/nestjs-memcached/compare/3.1.1...3.1.2) (2022-11-08)
+
+
+### Bug Fixes
+
+* pick memcached deps ([b13ff04](https://github.com/andreafspeziale/nestjs-memcached/commit/b13ff041c5e39c331bac41ec4a1da591739b8ffc))
+
 ## [3.1.1](https://github.com/andreafspeziale/nestjs-memcached/compare/3.1.0...3.1.1) (2022-10-18)
 
 
