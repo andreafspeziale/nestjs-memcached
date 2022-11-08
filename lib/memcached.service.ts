@@ -12,6 +12,7 @@ import {
   WrapperProcessor,
   WrappedValue,
   Parser,
+  IncrDecrOptions,
 } from './memcached.interfaces';
 import { InjectMemcached, InjectMemcachedOptions } from './memcached.decorators';
 import { defaultWrapperProcessor } from './memcached.utils';
@@ -70,7 +71,7 @@ export class MemcachedService {
       : this.wrapperProcessor(wrapperProcessorPayload);
 
     const parsed =
-      options?.superjson || this.memcachedModuleOptions.superjson
+      (options?.superjson || this.memcachedModuleOptions.superjson) && isNaN(Number(value))
         ? this.parser.stringify(wrappedValue)
         : wrappedValue;
 
@@ -85,7 +86,7 @@ export class MemcachedService {
       : key;
 
     const parsed =
-      options?.superjson || this.memcachedModuleOptions.superjson
+      (options?.superjson || this.memcachedModuleOptions.superjson) && isNaN(Number(value))
         ? this.parser.stringify(value)
         : value;
 
@@ -110,6 +111,39 @@ export class MemcachedService {
         ? this.parser.parse<T>(cached)
         : cached
       : null;
+  }
+
+  /**
+   *
+   * * returns the current value after success increment
+   * ! returns false if key does not exists
+   * ! throws OperationalError if incr is applied to non numeric value
+   */
+  async incr(key: string, amount: number, options?: IncrDecrOptions): Promise<boolean | number> {
+    const processedKey = options?.keyProcessor
+      ? options.keyProcessor(key)
+      : this.keyProcessor
+      ? this.keyProcessor(key)
+      : key;
+
+    return this.client.incrAsync(processedKey, amount);
+  }
+
+  /**
+   *
+   * * returns the current value after success increment
+   * * decr of 0 returns 0
+   * ! returns false if key does not exists
+   * ! throws OperationalError if incr is applied to non numeric value
+   */
+  async decr(key: string, amount: number, options?: IncrDecrOptions): Promise<boolean | number> {
+    const processedKey = options?.keyProcessor
+      ? options.keyProcessor(key)
+      : this.keyProcessor
+      ? this.keyProcessor(key)
+      : key;
+
+    return this.client.decrAsync(processedKey, amount);
   }
 
   async flush(): Promise<boolean[]> {
