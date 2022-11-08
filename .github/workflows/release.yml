@@ -8,29 +8,32 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
         with:
           ref: main
           fetch-depth: 0
-      - uses: actions/setup-node@v3
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
         with:
           node-version: 18.5.0
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        id: pnpm-install
+        with:
+          version: 7.14.2
+          run_install: true
       - name: Git config
         run: |
           git config user.name ${{ secrets.CI_GITHUB_USER }}
           git config user.email ${{ secrets.CI_GITHUB_EMAIL }}
-      - name: Install
-        run: npm ci
       - name: Build
-        run: npm run build
+        run: pnpm build
       - name: Set registry
-        run: npm config set //registry.npmjs.org/:_authToken ${{ secrets.CI_NPM_TOKEN }}
+        run: pnpm config set //registry.npmjs.org/:_authToken ${{ secrets.CI_NPM_TOKEN }}
       - name: Release
-        run: npm run release
+        run: pnpm release
       - name: Update develop
         run: |
           git branch
