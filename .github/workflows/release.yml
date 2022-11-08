@@ -25,11 +25,25 @@ jobs:
         id: pnpm-install
         with:
           version: 7.14.2
-          run_install: true
+          run_install: false
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+      - name: Setup pnpm cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
       - name: Git config
         run: |
           git config user.name ${{ secrets.CI_GITHUB_USER }}
           git config user.email ${{ secrets.CI_GITHUB_EMAIL }}
+      - name: Install dependencies
+        run: pnpm install
       - name: Build
         run: pnpm build
       - name: Set registry
