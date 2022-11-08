@@ -1,5 +1,12 @@
 
 
+## [3.1.5](https://github.com/andreafspeziale/nestjs-memcached/compare/3.1.4...3.1.5) (2022-11-08)
+
+
+### Miscellaneous
+
+* ci cache to reduce installation time ([40ecb4f](https://github.com/andreafspeziale/nestjs-memcached/commit/40ecb4f13e814801d06fdf76e48d1e02e8060ef5))
+
 ## [3.1.4](https://github.com/andreafspeziale/nestjs-memcached/compare/3.1.3...3.1.4) (2022-11-08)
 
 
