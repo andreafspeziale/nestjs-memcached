@@ -86,7 +86,7 @@ export class MemcachedService {
       : key;
 
     const parsed =
-      (options?.superjson || this.memcachedModuleOptions.superjson) && isNaN(Number(value))
+      (options?.superjson || this.memcachedModuleOptions.superjson) && typeof value !== 'number'
         ? this.parser.stringify(value)
         : value;
 
