@@ -21,19 +21,19 @@
 ### npm
 
 ```sh
-npm install @andreafspeziale/nestjs-memcached memjs
+npm install @andreafspeziale/nestjs-memcached
 ```
 
 ### yarn
 
 ```sh
-yarn add @andreafspeziale/nestjs-memcached memjs
+yarn add @andreafspeziale/nestjs-memcached
 ```
 
 ### pnpm
 
 ```sh
-pnpm install @andreafspeziale/nestjs-memcached memjs
+pnpm install @andreafspeziale/nestjs-memcached
 ```
 
 ## How to use?
@@ -165,6 +165,12 @@ The provided `MemcachedService` is an opinionated wrapper around `memjs` trying 
 `setWithMeta` enables `refresh-ahead` cache pattern in order to let you add a logical expiration called `ttr (time to refresh)` to the cached data and more.
 
 So each time you get some cached data it will contain additional properties in order to help you decide whatever business logic needs to be applied.
+
+## Stay in touch
+
+- Author - [Andrea Francesco Speziale](https://twitter.com/andreafspeziale)
+- Website - [https://nestjs.com](https://nestjs.com/)
+- Twitter - [@nestframework](https://twitter.com/nestframework)
 
 ## License
 

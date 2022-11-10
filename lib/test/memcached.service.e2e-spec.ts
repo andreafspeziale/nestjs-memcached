@@ -201,6 +201,22 @@ describe('MemcachedService (e2e)', () => {
           expect(cached).toBe('value');
         });
 
+        it('Should return a Date object only if superjson is active', async () => {
+          await memcachedService.set('key', new Date());
+          const result = await memcachedService.get('key');
+
+          options.superjson
+            ? expect(result).toBeInstanceOf(Date)
+            : expect(typeof result).toBe('string');
+        });
+
+        it('Should always return a number when set', async () => {
+          await memcachedService.set('key', 1);
+          const result = await memcachedService.get('key');
+
+          expect(result).toBe(1);
+        });
+
         it('Should return the value of the cached key/value pair as complex object', async () => {
           const data = {
             property: 'myProperty',
