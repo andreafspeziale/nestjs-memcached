@@ -201,6 +201,20 @@ describe('MemcachedService (e2e)', () => {
           expect(cached).toBe('value');
         });
 
+        it('Should return the value of the cached key/value with override keyProcessor', async () => {
+          const result = await memcachedService.set('key', 'value', {
+            keyProcessor: (key: string): string => `t_${key}`,
+          });
+
+          expect(result).toBe(true);
+
+          const cached = await memcachedService.get('key', {
+            keyProcessor: (key: string): string => `t_${key}`,
+          });
+
+          expect(cached).toBe('value');
+        });
+
         it('Should return a Date object only if superjson is active', async () => {
           await memcachedService.set('key', new Date());
           const result = await memcachedService.get('key');
@@ -253,7 +267,7 @@ describe('MemcachedService (e2e)', () => {
         });
       });
 
-      describe('incr', () => {
+      describe('set & incr', () => {
         it('Should correclty increment the key numeric value', async () => {
           const incr = 1;
           const curr = 0;
@@ -279,7 +293,7 @@ describe('MemcachedService (e2e)', () => {
         });
       });
 
-      describe('decr', () => {
+      describe('set & decr', () => {
         it('Should correclty decrement the key numeric value', async () => {
           const decr = 1;
           const curr = 1;
