@@ -166,6 +166,12 @@ The provided `MemcachedService` is an opinionated wrapper around `memjs` trying 
 
 So each time you get some cached data it will contain additional properties in order to help you decide whatever business logic needs to be applied.
 
+## Stay in touch
+
+- Author - [Andrea Francesco Speziale](https://twitter.com/andreafspeziale)
+- Website - [https://nestjs.com](https://nestjs.com/)
+- Twitter - [@nestframework](https://twitter.com/nestframework)
+
 ## License
 
 nestjs-memcached [MIT licensed](LICENSE).

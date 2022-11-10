@@ -8,7 +8,6 @@
     "declaration": true,
     "sourceMap": false,
     "outDir": "./dist",
-    "removeComments": true,
     "strict": true,
   },
   "include": [
