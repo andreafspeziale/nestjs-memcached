@@ -1,5 +1,22 @@
 
 
+## [3.2.1](https://github.com/andreafspeziale/nestjs-memcached/compare/3.2.0...3.2.1) (2022-11-10)
+
+
+### Bug Fixes
+
+* number primitive caching when superjson is on ([dc15f13](https://github.com/andreafspeziale/nestjs-memcached/commit/dc15f13c56c21130ff87e651aca9bd17c5a0b66f))
+* readme ([d5e199d](https://github.com/andreafspeziale/nestjs-memcached/commit/d5e199d3ba567cee25deb34071633795721701da))
+
+
+### Miscellaneous
+
+* husky scripts with pnpm ([82be5d6](https://github.com/andreafspeziale/nestjs-memcached/commit/82be5d64016a644b2da30799734cf5a61d9b11a6))
+* update dependency jest to v29.3.1 ([004475b](https://github.com/andreafspeziale/nestjs-memcached/commit/004475b86cf28b29876fffd9c670c63c4e518287))
+* update pnpm to v7.15.0 ([bc276fc](https://github.com/andreafspeziale/nestjs-memcached/commit/bc276fc73dc1f7bf25bfc762ab57b1037eb037db))
+* update pnpm to v7.15.0 ci ([c909706](https://github.com/andreafspeziale/nestjs-memcached/commit/c909706b211ff91f47165eb293c0aaa384933156))
+* update readme and enable comments in build ([66c7fcd](https://github.com/andreafspeziale/nestjs-memcached/commit/66c7fcda03013046a8b9b39ec9067888dbd2df76))
+
 ## [3.2.0](https://github.com/andreafspeziale/nestjs-memcached/compare/3.1.5...3.2.0) (2022-11-08)
 
 
