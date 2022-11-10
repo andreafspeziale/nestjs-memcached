@@ -21,19 +21,19 @@
 ### npm
 
 ```sh
-npm install @andreafspeziale/nestjs-memcached memjs
+npm install @andreafspeziale/nestjs-memcached
 ```
 
 ### yarn
 
 ```sh
-yarn add @andreafspeziale/nestjs-memcached memjs
+yarn add @andreafspeziale/nestjs-memcached
 ```
 
 ### pnpm
 
 ```sh
-pnpm install @andreafspeziale/nestjs-memcached memjs
+pnpm install @andreafspeziale/nestjs-memcached
 ```
 
 ## How to use?
