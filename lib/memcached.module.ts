@@ -1,24 +1,27 @@
 import { DynamicModule, Global, Provider } from '@nestjs/common';
-import * as MemcachedClient from 'memcached';
-import { MEMCACHED_CLIENT_TOKEN, MEMCACHED_MODULE_OPTIONS_TOKEN } from './memcached.constants';
-import {
+import type MemcachedClient from 'memcached';
+import type {
   MemcachedModuleAsyncOptions,
   MemcachedModuleOptions,
   MemcachedModuleOptionsFactory,
 } from './memcached.interfaces';
 import { MemcachedService } from './memcached.service';
-import { createMemcachedClient } from './memcached.utils';
+import {
+  createMemcachedClient,
+  getMemcachedClientToken,
+  getMemcachedModuleOptionsToken,
+} from './memcached.utils';
 
 @Global()
 export class MemcachedModule {
   public static forRoot(options: MemcachedModuleOptions): DynamicModule {
     const optionsProvider: Provider = {
-      provide: MEMCACHED_MODULE_OPTIONS_TOKEN,
+      provide: getMemcachedModuleOptionsToken(),
       useValue: options,
     };
 
     const clientProvider: Provider = {
-      provide: MEMCACHED_CLIENT_TOKEN,
+      provide: getMemcachedClientToken(),
       useValue: createMemcachedClient(options),
     };
 
@@ -34,19 +37,17 @@ export class MemcachedModule {
   }
 
   public static forRootAsync(options: MemcachedModuleAsyncOptions): DynamicModule {
-    const clientAsyncProvider = {
-      provide: MEMCACHED_CLIENT_TOKEN,
-      useFactory: async ({ connections, ttl }: MemcachedModuleOptions): Promise<MemcachedClient> =>
-        createMemcachedClient({ connections, ttl }),
-      inject: [MEMCACHED_MODULE_OPTIONS_TOKEN],
+    const memcachedClientProvider: Provider = {
+      provide: getMemcachedClientToken(),
+      useFactory: (opts: MemcachedModuleOptions): MemcachedClient =>
+        createMemcachedClient({ connections: opts.connections || [] }),
+      inject: [getMemcachedModuleOptionsToken()],
     };
-
-    const asyncProviders = this.createAsyncProviders(options);
 
     return {
       module: MemcachedModule,
-      providers: [...asyncProviders, clientAsyncProvider, MemcachedService],
-      exports: [...asyncProviders, clientAsyncProvider, MemcachedService],
+      providers: [...this.createAsyncProviders(options), memcachedClientProvider, MemcachedService],
+      exports: [...this.createAsyncProviders(options), memcachedClientProvider, MemcachedService],
     };
   }
 
@@ -75,7 +76,7 @@ export class MemcachedModule {
   private static createAsyncOptionsProvider(options: MemcachedModuleAsyncOptions): Provider {
     if (options.useFactory) {
       return {
-        provide: MEMCACHED_MODULE_OPTIONS_TOKEN,
+        provide: getMemcachedModuleOptionsToken(),
         useFactory: options.useFactory,
         inject: options.inject || [],
       };
@@ -86,7 +87,7 @@ export class MemcachedModule {
     }
 
     return {
-      provide: MEMCACHED_MODULE_OPTIONS_TOKEN,
+      provide: getMemcachedModuleOptionsToken(),
       useFactory: async (
         optionsFactory: MemcachedModuleOptionsFactory
       ): Promise<MemcachedModuleOptions> => optionsFactory.createMemcachedModuleOptions(),

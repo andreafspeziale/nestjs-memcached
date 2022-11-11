@@ -1,19 +1,12 @@
 {
+  "extends": "@tsconfig/node18-strictest/tsconfig.json",
   "compilerOptions": {
-    "target": "es2016",
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "module": "commonjs",
-    "rootDir": "./lib",
+    "removeComments": true,
     "declaration": true,
-    "sourceMap": false,
-    "outDir": "./dist",
-    "strict": true,
+    "outDir": "./dist"
   },
   "include": [
     "lib"
-  ],
-  "exclude": [
-    "node_modules",
   ]
 }

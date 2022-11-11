@@ -1,6 +1,6 @@
 module.exports = {
   rootDir: 'lib',
-  moduleFileExtensions: ['js', 'json', 'ts'],
+  moduleFileExtensions: ['js', 'ts'],
   testEnvironment: 'node',
   testRegex: '.*\\.(e2e-)?spec\\.ts$',
   transform: {
@@ -9,7 +9,6 @@ module.exports = {
   collectCoverageFrom: ['**/*.(t|j)s'],
   coverageDirectory: '../coverage',
   coveragePathIgnorePatterns: [
-    '<rootDir>/test/test.service.ts',
-    '<rootDir>/index.ts',
+    '<rootDir>/test',
   ],
 };

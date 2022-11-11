@@ -9,6 +9,7 @@ specifiers:
   '@nestjs/platform-express': 9.2.0
   '@nestjs/testing': 9.2.0
   '@release-it/conventional-changelog': 5.1.1
+  '@tsconfig/node18-strictest': 1.0.0
   '@types/bluebird': 3.5.37
   '@types/jest': 29.2.2
   '@types/memcached': 2.2.7
@@ -49,6 +50,7 @@ devDependencies:
   '@nestjs/platform-express': 9.2.0_pf2fb646rsvo5szivgkaevcpvi
   '@nestjs/testing': 9.2.0_3jiwpo56qab566j5kwfezyelg4
   '@release-it/conventional-changelog': 5.1.1_release-it@15.5.0
+  '@tsconfig/node18-strictest': 1.0.0
   '@types/bluebird': 3.5.37
   '@types/jest': 29.2.2
   '@types/memcached': 2.2.7
@@ -1246,6 +1248,10 @@ packages:
 
   /@tsconfig/node16/1.0.3:
     resolution: {integrity: sha512-yOlFc+7UtL/89t2ZhjPvvB/DeAr3r+Dq58IgzsFkOAvVC6NMJXmCGjbptdXdR9qsX7pKcTL+s87FtYREi2dEEQ==}
+    dev: true
+
+  /@tsconfig/node18-strictest/1.0.0:
+    resolution: {integrity: sha512-bOuNKwO4Fzbt+Su5wqI9zNHwx5C25gLnutwVQA1sBZk0cW8UjVPVcwzIUhJIIJDUx7zDEbAwdCD2HfvIsV8dYg==}
     dev: true
 
   /@types/babel__core/7.1.20:

@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import type { INestApplication } from '@nestjs/common';
 import {
   MemcachedService,
   MemcachedModule,
@@ -64,6 +64,31 @@ describe('MemcachedService (e2e)', () => {
           const cached = await memcachedService.get<
             WrappedValue<string> & { createdAt: Date | string } & CachingOptions
           >('key');
+
+          expect(cached?.ttl).toBe(options.ttl);
+          options.ttr ? expect(cached?.ttr).toBe(options.ttr) : expect(cached?.ttr).toBeUndefined();
+          expect(cached?.content).toBe('value');
+
+          if (options.wrapperProcessor) {
+            expect(cached?.createdAt).toBeDefined();
+            options.superjson
+              ? expect(cached?.createdAt).toBeInstanceOf(Date)
+              : expect(typeof cached?.createdAt).toBe('string');
+          }
+        });
+
+        it('Should return the value of the cached key/value pair with override keyProcessor', async () => {
+          const result = await memcachedService.setWithMeta('key', 'value', {
+            keyProcessor: (key: string): string => `t_${key}`,
+          });
+
+          expect(result).toBe(true);
+
+          const cached = await memcachedService.get<
+            WrappedValue<string> & { createdAt: Date | string } & CachingOptions
+          >('key', {
+            keyProcessor: (key: string): string => `t_${key}`,
+          });
 
           expect(cached?.ttl).toBe(options.ttl);
           options.ttr ? expect(cached?.ttr).toBe(options.ttr) : expect(cached?.ttr).toBeUndefined();
@@ -201,6 +226,20 @@ describe('MemcachedService (e2e)', () => {
           expect(cached).toBe('value');
         });
 
+        it('Should return the value of the cached key/value with override keyProcessor', async () => {
+          const result = await memcachedService.set('key', 'value', {
+            keyProcessor: (key: string): string => `t_${key}`,
+          });
+
+          expect(result).toBe(true);
+
+          const cached = await memcachedService.get('key', {
+            keyProcessor: (key: string): string => `t_${key}`,
+          });
+
+          expect(cached).toBe('value');
+        });
+
         it('Should return a Date object only if superjson is active', async () => {
           await memcachedService.set('key', new Date());
           const result = await memcachedService.get('key');
@@ -253,13 +292,29 @@ describe('MemcachedService (e2e)', () => {
         });
       });
 
-      describe('incr', () => {
+      describe('set & incr', () => {
         it('Should correclty increment the key numeric value', async () => {
           const incr = 1;
           const curr = 0;
 
           await memcachedService.set('key', curr);
+
           const result = await memcachedService.incr('key', incr);
+
+          expect(result).toBe(curr + incr);
+        });
+
+        it('Should correclty increment the key numeric value with override keyProcessor', async () => {
+          const incr = 1;
+          const curr = 0;
+
+          await memcachedService.set('key', curr, {
+            keyProcessor: (key: string): string => `t_${key}`,
+          });
+
+          const result = await memcachedService.incr('key', incr, {
+            keyProcessor: (key: string): string => `t_${key}`,
+          });
 
           expect(result).toBe(curr + incr);
         });
@@ -279,13 +334,29 @@ describe('MemcachedService (e2e)', () => {
         });
       });
 
-      describe('decr', () => {
+      describe('set & decr', () => {
         it('Should correclty decrement the key numeric value', async () => {
           const decr = 1;
           const curr = 1;
 
           await memcachedService.set('key', curr);
+
           const result = await memcachedService.decr('key', decr);
+
+          expect(result).toBe(curr - decr);
+        });
+
+        it('Should correclty decrement the key numeric value with override keyProcessor', async () => {
+          const decr = 1;
+          const curr = 1;
+
+          await memcachedService.set('key', curr, {
+            keyProcessor: (key: string): string => `t_${key}`,
+          });
+
+          const result = await memcachedService.decr('key', decr, {
+            keyProcessor: (key: string): string => `t_${key}`,
+          });
 
           expect(result).toBe(curr - decr);
         });
@@ -295,6 +366,7 @@ describe('MemcachedService (e2e)', () => {
           const curr = 0;
 
           await memcachedService.set('key', curr);
+
           const result = await memcachedService.decr('key', decr);
 
           expect(result).toBe(curr);
