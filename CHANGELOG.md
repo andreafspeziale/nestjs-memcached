@@ -1,5 +1,12 @@
 
 
+## [3.2.2](https://github.com/andreafspeziale/nestjs-memcached/compare/3.2.1...3.2.2) (2022-11-11)
+
+
+### Miscellaneous
+
+* move to @tsconfig/node18-strictest ts rules ([560b02c](https://github.com/andreafspeziale/nestjs-memcached/commit/560b02c1de7cdc378583d6c6c5c6b2551fdb5595))
+
 ## [3.2.1](https://github.com/andreafspeziale/nestjs-memcached/compare/3.2.0...3.2.1) (2022-11-10)
 
 
