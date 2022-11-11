@@ -1,5 +1,5 @@
-import { ModuleMetadata, Type } from '@nestjs/common';
-import { stringify, parse } from 'superjson';
+import type { ModuleMetadata, Type } from '@nestjs/common';
+import type { stringify, parse } from 'superjson';
 
 export interface CachingOptions {
   ttl: number;
@@ -58,8 +58,8 @@ export interface MemcachedModuleOptionsFactory {
 }
 
 export interface MemcachedModuleAsyncOptions extends Pick<ModuleMetadata, 'imports'> {
-  useExisting?: Type<MemcachedModuleOptionsFactory>;
-  useClass?: Type<MemcachedModuleOptionsFactory>;
-  useFactory?: (...args: any[]) => Promise<MemcachedModuleOptions> | MemcachedModuleOptions;
   inject?: any[];
+  useClass?: Type<MemcachedModuleOptionsFactory>;
+  useExisting?: Type<MemcachedModuleOptionsFactory>;
+  useFactory?: (...args: any[]) => Promise<MemcachedModuleOptions> | MemcachedModuleOptions;
 }
