@@ -1,8 +1,8 @@
-import * as b from 'bluebird';
+import b from 'bluebird';
 import { Injectable } from '@nestjs/common';
-import * as MemcachedClient from 'memcached';
+import type * as MemcachedClient from 'memcached';
 import { stringify, parse } from 'superjson';
-import {
+import type {
   CachingOptions,
   GetOptions,
   KeyProcessor,
@@ -21,7 +21,7 @@ import { defaultWrapperProcessor } from './memcached.utils';
 export class MemcachedService {
   private readonly client: ReturnType<typeof b.promisifyAll<MemcachedClient>>;
   private readonly wrapperProcessor: WrapperProcessor;
-  private readonly keyProcessor?: KeyProcessor;
+  private readonly keyProcessor: KeyProcessor | undefined;
   private readonly parser: Parser;
 
   constructor(
