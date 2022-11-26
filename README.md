@@ -146,7 +146,7 @@ export class SampleFacade {
 
     if(cachedItem === null) {
       ...
-      const { content, ...meta } = await this.memcachedService.set<string>('key', 'value');
+      await this.memcachedService.set<string>('key', 'value');
       ...
     }
 }
@@ -155,12 +155,10 @@ export class SampleFacade {
 You can also set all the proper `Processors` and `CachingOptions` inline in order to override the global values specified during the `MemcachedModule` import
 
 ```ts
-    await this.memcachedService.set<string>('key', 'value', { ttl: 100 });
-    ...
-    await this.memcachedService.set<string>('key', 'value', { ttl: 100, ttr: 50 });
+await this.memcachedService.set<string>('key', 'value', { ttl: 100 });
 ```
 
-The provided `MemcachedService` is an opinionated wrapper around `memjs` trying to be unopinionated as much as possibile at the same time.
+The provided `MemcachedService` is an opinionated wrapper around [memcached](https://github.com/3rd-Eden/memcached#readme) trying to be unopinionated as much as possibile at the same time.
 
 `setWithMeta` enables `refresh-ahead` cache pattern in order to let you add a logical expiration called `ttr (time to refresh)` to the cached data and more.
 

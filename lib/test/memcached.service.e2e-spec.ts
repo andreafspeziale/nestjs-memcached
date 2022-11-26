@@ -346,6 +346,17 @@ describe('MemcachedService (e2e)', () => {
           expect(result).toBe(curr - decr);
         });
 
+        it('Should correclty decrement returning 0 even if decrement goes negative', async () => {
+          const decr = 100;
+          const curr = 50;
+
+          await memcachedService.set('key', curr);
+
+          const result = await memcachedService.decr('key', decr);
+
+          expect(result).toBe(0);
+        });
+
         it('Should correclty decrement the key numeric value with override keyProcessor', async () => {
           const decr = 1;
           const curr = 1;
