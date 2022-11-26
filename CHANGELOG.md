@@ -1,5 +1,30 @@
 
 
+## [3.2.3](https://github.com/andreafspeziale/nestjs-memcached/compare/3.2.2...3.2.3) (2022-11-26)
+
+
+### Bug Fixes
+
+* incorrect README ([12425f3](https://github.com/andreafspeziale/nestjs-memcached/commit/12425f3be8755f521964eccebb0063a7ea9c6da5))
+
+
+### Miscellaneous
+
+* update commitlint monorepo to v17.3.0 ([baf6717](https://github.com/andreafspeziale/nestjs-memcached/commit/baf67170e30cfbdc87c1867fcd24b8f35e8d725d))
+* update dependency @types/jest to v29.2.3 ([4ca597b](https://github.com/andreafspeziale/nestjs-memcached/commit/4ca597b14eb0523c060a53ff3e2fca89fbfb1ca6))
+* update dependency eslint to v8.28.0 ([b8367ac](https://github.com/andreafspeziale/nestjs-memcached/commit/b8367aca51a88f3ecb51245b1c0edc8aeb652d02))
+* update dependency lint-staged to v13.0.4 ([6e0fcd2](https://github.com/andreafspeziale/nestjs-memcached/commit/6e0fcd238c9af37d06aac7f94dbc9174bddf6593))
+* update dependency prettier to v2.8.0 ([5b9f171](https://github.com/andreafspeziale/nestjs-memcached/commit/5b9f1719020ee6c21d0d8ded84f9292bfb96c2fc))
+* update dependency typescript to v4.9.3 ([0f3a0c8](https://github.com/andreafspeziale/nestjs-memcached/commit/0f3a0c81428eb64c20b9778c7a0e4729ca6dad56))
+* update pnpm to v7.16.0 ([b4cad52](https://github.com/andreafspeziale/nestjs-memcached/commit/b4cad52eba73f1fb4d98d01a435ba23eb8aa40aa))
+* update pnpm to v7.16.0 ci ([66072b5](https://github.com/andreafspeziale/nestjs-memcached/commit/66072b5b09c682fe2c0028c88c9009fbf65d843f))
+* update pnpm to v7.16.0 ci ([bb65d3b](https://github.com/andreafspeziale/nestjs-memcached/commit/bb65d3b9570f15de5519b273744fadccb4ad1d47))
+* update pnpm to v7.16.1 ([79c5081](https://github.com/andreafspeziale/nestjs-memcached/commit/79c50814925ae0defffa7244a26ff263dee33742))
+* update pnpm to v7.17.0 ([05b95f4](https://github.com/andreafspeziale/nestjs-memcached/commit/05b95f4db5be6767a1c22ea3543d5c2921247426))
+* update pnpm to v7.x ci ([945bac7](https://github.com/andreafspeziale/nestjs-memcached/commit/945bac7d698a2a507516d418d7fdf4400cd63a21))
+* update typescript-eslint monorepo to v5.43.0 ([2adabbf](https://github.com/andreafspeziale/nestjs-memcached/commit/2adabbfef5934e5dd96f05d72687d66a04669ca7))
+* update typescript-eslint monorepo to v5.44.0 ([9515898](https://github.com/andreafspeziale/nestjs-memcached/commit/951589802b0d4d2aca4e4536ead234feb878d513))
+
 ## [3.2.2](https://github.com/andreafspeziale/nestjs-memcached/compare/3.2.1...3.2.2) (2022-11-11)
 
 
