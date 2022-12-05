@@ -11,7 +11,7 @@ specifiers:
   '@release-it/conventional-changelog': 5.1.1
   '@tsconfig/node18-strictest': 1.0.0
   '@types/bluebird': 3.5.38
-  '@types/jest': 29.2.3
+  '@types/jest': 29.2.4
   '@types/memcached': 2.2.7
   '@typescript-eslint/eslint-plugin': 5.45.0
   '@typescript-eslint/parser': 5.45.0
@@ -52,7 +52,7 @@ devDependencies:
   '@release-it/conventional-changelog': 5.1.1_release-it@15.5.1
   '@tsconfig/node18-strictest': 1.0.0
   '@types/bluebird': 3.5.38
-  '@types/jest': 29.2.3
+  '@types/jest': 29.2.4
   '@types/memcached': 2.2.7
   '@typescript-eslint/eslint-plugin': 5.45.0_yjegg5cyoezm3fzsmuszzhetym
   '@typescript-eslint/parser': 5.45.0_s5ps7njkmjlaqajutnox5ntcla
@@ -1302,8 +1302,8 @@ packages:
       '@types/istanbul-lib-report': 3.0.0
     dev: true
 
-  /@types/jest/29.2.3:
-    resolution: {integrity: sha512-6XwoEbmatfyoCjWRX7z0fKMmgYKe9+/HrviJ5k0X/tjJWHGAezZOfYaxqQKuzG/TvQyr+ktjm4jgbk0s4/oF2w==}
+  /@types/jest/29.2.4:
+    resolution: {integrity: sha512-PipFB04k2qTRPePduVLTRiPzQfvMeLwUN3Z21hsAKaB/W9IIzgB2pizCL466ftJlcyZqnHoC9ZHpxLGl3fS86A==}
     dependencies:
       expect: 29.3.1
       pretty-format: 29.3.1
