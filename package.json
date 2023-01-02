@@ -36,7 +36,7 @@
     "rxjs": "7.x"
   },
   "dependencies": {
-    "@nestjs/common": "9.2.0",
+    "@nestjs/common": "9.2.1",
     "bluebird": "3.7.2",
     "memcached": "2.2.2",
     "reflect-metadata": "0.1.13",
@@ -47,9 +47,9 @@
     "@commitlint/cli": "17.3.0",
     "@commitlint/config-conventional": "17.3.0",
     "@nestjs/config": "2.2.0",
-    "@nestjs/core": "9.2.0",
-    "@nestjs/platform-express": "9.2.0",
-    "@nestjs/testing": "9.2.0",
+    "@nestjs/core": "9.2.1",
+    "@nestjs/platform-express": "9.2.1",
+    "@nestjs/testing": "9.2.1",
     "@release-it/conventional-changelog": "5.1.1",
     "@tsconfig/node18-strictest": "1.0.0",
     "@types/bluebird": "3.5.38",
