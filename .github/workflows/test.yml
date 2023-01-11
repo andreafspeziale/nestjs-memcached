@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       memcached:
-        image: bitnami/memcached:1.6.17
+        image: bitnami/memcached:1.6.18
         ports:
           - 11211:11211
     steps:
