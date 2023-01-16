@@ -18,7 +18,7 @@ specifiers:
   bluebird: 3.7.2
   eslint: 8.32.0
   eslint-config-prettier: 8.6.0
-  eslint-plugin-import: 2.27.4
+  eslint-plugin-import: 2.27.5
   eslint-plugin-prettier: 4.2.1
   eslint-plugin-unused-imports: 2.0.0
   husky: 8.0.3
@@ -58,7 +58,7 @@ devDependencies:
   '@typescript-eslint/parser': 5.48.2_7uibuqfxkfaozanbtbziikiqje
   eslint: 8.32.0
   eslint-config-prettier: 8.6.0_eslint@8.32.0
-  eslint-plugin-import: 2.27.4_2l6piu6guil2f63lj3qmhzbnn4
+  eslint-plugin-import: 2.27.5_2l6piu6guil2f63lj3qmhzbnn4
   eslint-plugin-prettier: 4.2.1_cn4lalcyadplruoxa5mhp7j3dq
   eslint-plugin-unused-imports: 2.0.0_virssgr5omih4ylyae2gddvmxu
   husky: 8.0.3
@@ -2829,8 +2829,8 @@ packages:
       - supports-color
     dev: true
 
-  /eslint-plugin-import/2.27.4_2l6piu6guil2f63lj3qmhzbnn4:
-    resolution: {integrity: sha512-Z1jVt1EGKia1X9CnBCkpAOhWy8FgQ7OmJ/IblEkT82yrFU/xJaxwujaTzLWqigewwynRQ9mmHfX9MtAfhxm0sA==}
+  /eslint-plugin-import/2.27.5_2l6piu6guil2f63lj3qmhzbnn4:
+    resolution: {integrity: sha512-LmEt3GVofgiGuiE+ORpnvP+kAm3h6MLZJ4Q5HCyHADofsb4VzXFsRiWj3c0OFiV+3DWFh0qg3v9gcPlfc3zRow==}
     engines: {node: '>=4'}
     peerDependencies:
       '@typescript-eslint/parser': '*'
