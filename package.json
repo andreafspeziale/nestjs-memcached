@@ -21,7 +21,7 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
-    "release": "release-it"
+    "release": "release-it --verbose"
   },
   "keywords": [
     "nest",
