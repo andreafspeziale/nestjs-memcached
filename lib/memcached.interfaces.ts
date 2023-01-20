@@ -43,6 +43,8 @@ export type SetOptions = Partial<Pick<CachingOptions, 'ttl'>> &
   Pick<Processors, 'keyProcessor'> &
   Pick<MemcachedModuleOptions, 'superjson'>;
 
+export type AddOptions = SetOptions;
+
 export type GetOptions = Pick<Processors, 'keyProcessor'> &
   Pick<MemcachedModuleOptions, 'superjson'>;
 

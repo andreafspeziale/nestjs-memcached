@@ -292,6 +292,85 @@ describe('MemcachedService (e2e)', () => {
         });
       });
 
+      describe('add & get', () => {
+        it('Should return the value of the cached key/value pair along with default', async () => {
+          const result = await memcachedService.add('key', 'value');
+
+          expect(result).toBe(true);
+
+          const cached = await memcachedService.get('key');
+
+          expect(cached).toBe('value');
+        });
+
+        it('Should return the value of the cached key/value with override keyProcessor', async () => {
+          const result = await memcachedService.add('key', 'value', {
+            keyProcessor: (key: string): string => `t_${key}`,
+          });
+
+          expect(result).toBe(true);
+
+          const cached = await memcachedService.get('key', {
+            keyProcessor: (key: string): string => `t_${key}`,
+          });
+
+          expect(cached).toBe('value');
+        });
+
+        it('Should return a Date object only if superjson is active', async () => {
+          await memcachedService.add('key', new Date());
+          const result = await memcachedService.get('key');
+
+          options.superjson
+            ? expect(result).toBeInstanceOf(Date)
+            : expect(typeof result).toBe('string');
+        });
+
+        it('Should always return a number when set', async () => {
+          await memcachedService.add('key', 1);
+          const result = await memcachedService.get('key');
+
+          expect(result).toBe(1);
+        });
+
+        it('Should return the value of the cached key/value pair as complex object', async () => {
+          const data = {
+            property: 'myProperty',
+            list: [],
+            date: new Date(),
+          };
+
+          const result = await memcachedService.add('key', data);
+
+          expect(result).toBe(true);
+
+          const cached = await memcachedService.get<
+            Omit<typeof data, 'date'> & { date: Date | string }
+          >('key');
+
+          const {
+            property,
+            list,
+            date,
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          } = cached!;
+
+          expect(property).toBe(data.property);
+          expect(list).toEqual(data.list);
+          options.superjson
+            ? expect(date).toBeInstanceOf(Date)
+            : expect(typeof date).toBe('string');
+        });
+
+        it('Should return false if cached key/value pair already exists', async () => {
+          await memcachedService.add('key', 'value');
+
+          await expect(memcachedService.add('key', 'value2')).rejects.toThrow(
+            new Error('Item is not stored')
+          );
+        });
+      });
+
       describe('set & incr', () => {
         it('Should correclty increment the key numeric value', async () => {
           const incr = 1;
