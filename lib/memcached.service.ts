@@ -13,6 +13,7 @@ import type {
   WrappedValue,
   Parser,
   IncrDecrOptions,
+  AddOptions,
 } from './memcached.interfaces';
 import { InjectMemcached, InjectMemcachedOptions } from './memcached.decorators';
 import { defaultWrapperProcessor } from './memcached.utils';
@@ -111,6 +112,30 @@ export class MemcachedService {
         ? this.parser.parse<T>(cached)
         : cached
       : null;
+  }
+
+  /**
+   *
+   * * used to handle race conditions
+   * ! throws OperationalError if item already stored
+   */
+  async add<T>(key: string, value: T, options?: AddOptions): Promise<boolean> {
+    const processedKey = options?.keyProcessor
+      ? options.keyProcessor(key)
+      : this.keyProcessor
+      ? this.keyProcessor(key)
+      : key;
+
+    const parsed =
+      (options?.superjson || this.memcachedModuleOptions.superjson) && typeof value !== 'number'
+        ? this.parser.stringify(value)
+        : value;
+
+    return this.client.addAsync(
+      processedKey,
+      parsed,
+      options?.ttl || this.memcachedModuleOptions.ttl
+    );
   }
 
   /**
