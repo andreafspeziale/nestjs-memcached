@@ -1,5 +1,12 @@
 
 
+## [3.3.1](https://github.com/andreafspeziale/nestjs-memcached/compare/3.3.0...3.3.1) (2023-01-22)
+
+
+### Miscellaneous
+
+* fix badge ([d07d848](https://github.com/andreafspeziale/nestjs-memcached/commit/d07d848cb4ef56084fa7beb9e5cf95b441eb864f))
+
 ## [3.3.0](https://github.com/andreafspeziale/nestjs-memcached/compare/3.2.3...3.3.0) (2023-01-20)
 
 
