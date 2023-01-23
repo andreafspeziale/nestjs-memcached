@@ -52,6 +52,8 @@ jobs:
         run: git update-index --assume-unchanged .npmrc
       - name: Release
         run: pnpm release
+      - name: Allow .npmrc to be committed
+        run: git update-index --no-assume-unchanged .npmrc
       - name: Update develop
         run: |
           git checkout .npmrc
