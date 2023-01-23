@@ -1,5 +1,12 @@
 
 
+## [3.3.6](https://github.com/andreafspeziale/nestjs-memcached/compare/3.3.5...3.3.6) (2023-01-23)
+
+
+### Miscellaneous
+
+* assume .npmrc changed after release ([0b366e1](https://github.com/andreafspeziale/nestjs-memcached/commit/0b366e11ce2878083a3e995e36ea159e9a323cbd))
+
 ## [3.3.5](https://github.com/andreafspeziale/nestjs-memcached/compare/3.3.4...3.3.5) (2023-01-23)
 
 
