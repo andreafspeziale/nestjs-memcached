@@ -47,7 +47,9 @@ jobs:
       - name: Build
         run: pnpm build
       - name: Set registry
-        run: pnpm config set //registry.npmjs.org/:_authToken ${{ secrets.CI_NPM_TOKEN }}
+        run: pnpm config set //registry.npmjs.org/:_authToken ${CI_NPM_TOKEN}
+        env:
+          CI_NPM_TOKEN: ${{ secrets.CI_NPM_TOKEN }}
       - name: Release
         run: pnpm release
       - name: Update develop
