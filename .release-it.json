@@ -1,8 +1,7 @@
 {
   "git": {
     "commitMessage": "chore: release v${version}",
-    "requireBranch": "main",
-    "requireCleanWorkingDir": false
+    "requireBranch": "main"
   },
   "github": {
     "release": true
