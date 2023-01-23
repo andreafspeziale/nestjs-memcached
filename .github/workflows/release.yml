@@ -47,13 +47,14 @@ jobs:
       - name: Build
         run: pnpm build
       - name: Set registry
-        run: pnpm config set //registry.npmjs.org/:_authToken ${CI_NPM_TOKEN}
-        env:
-          CI_NPM_TOKEN: ${{ secrets.CI_NPM_TOKEN }}
+        run: pnpm config set //registry.npmjs.org/:_authToken ${{ secrets.CI_NPM_TOKEN }}
+      - name: Prevent .npmrc from being committed
+        run: git update-index --assume-unchanged .npmrc
       - name: Release
         run: pnpm release
       - name: Update develop
         run: |
+          git checkout .npmrc
           git branch
           git checkout develop
           git rebase main
