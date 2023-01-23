@@ -1,5 +1,12 @@
 
 
+## [3.3.5](https://github.com/andreafspeziale/nestjs-memcached/compare/3.3.4...3.3.5) (2023-01-23)
+
+
+### Miscellaneous
+
+* revert release-it config ([947ee69](https://github.com/andreafspeziale/nestjs-memcached/commit/947ee693f81c8c13d618615f0dea664e1cc25a2c))
+
 ## [3.3.4](https://github.com/andreafspeziale/nestjs-memcached/compare/3.3.3...3.3.4) (2023-01-23)
 
 
