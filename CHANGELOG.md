@@ -1,5 +1,18 @@
 
 
+## [3.3.3](https://github.com/andreafspeziale/nestjs-memcached/compare/3.3.2...3.3.3) (2023-01-23)
+
+
+### Bug Fixes
+
+* npm token issue ([ced0930](https://github.com/andreafspeziale/nestjs-memcached/commit/ced093001174558a976eb4bf5dee00dd35243d62))
+
+
+### Miscellaneous
+
+* still dealing with npm token ([3fbb59b](https://github.com/andreafspeziale/nestjs-memcached/commit/3fbb59b99ddae82fcb94d9fb58f7acd004fa4465))
+* still dealing with npm token ([e63b01d](https://github.com/andreafspeziale/nestjs-memcached/commit/e63b01df59062b543e5525907421cac1992cdc26))
+
 ## [3.3.2](https://github.com/andreafspeziale/nestjs-memcached/compare/3.3.1...3.3.2) (2023-01-23)
 
 
