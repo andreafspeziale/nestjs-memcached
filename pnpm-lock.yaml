@@ -4,7 +4,7 @@ specifiers:
   '@commitlint/cli': 17.4.2
   '@commitlint/config-conventional': 17.4.2
   '@nestjs/common': 9.2.1
-  '@nestjs/config': 2.3.0
+  '@nestjs/config': 2.3.1
   '@nestjs/core': 9.2.1
   '@nestjs/platform-express': 9.2.1
   '@nestjs/testing': 9.2.1
@@ -45,7 +45,7 @@ dependencies:
 devDependencies:
   '@commitlint/cli': 17.4.2
   '@commitlint/config-conventional': 17.4.2
-  '@nestjs/config': 2.3.0_b4pxbpa7chblgbyake5iz5rdmu
+  '@nestjs/config': 2.3.1_b4pxbpa7chblgbyake5iz5rdmu
   '@nestjs/core': 9.2.1_e6la6qvsclaae2becwjnmfvsuq
   '@nestjs/platform-express': 9.2.1_hjcqpoaebdr7gdo5hgc22hthbe
   '@nestjs/testing': 9.2.1_wdbvfsxfdwzlwdfiyh2gynjl4m
@@ -942,8 +942,8 @@ packages:
       tslib: 2.4.1
       uuid: 9.0.0
 
-  /@nestjs/config/2.3.0_b4pxbpa7chblgbyake5iz5rdmu:
-    resolution: {integrity: sha512-VSAqoIagIrc0A3apaqC2O3a8VtQ+asw8xILmxvjK/eHW9m1rmhJ5NqkGf7m+uSv3Yxini4bzyb74Mk62+tB/cA==}
+  /@nestjs/config/2.3.1_b4pxbpa7chblgbyake5iz5rdmu:
+    resolution: {integrity: sha512-Ckzel0NZ9CWhNsLfE1hxfDuxJuEbhQvGxSlmZ1/X8awjRmAA/g3kT6M1+MO1SHj1wMtPyUfd9WpwkiqFbiwQgA==}
     peerDependencies:
       '@nestjs/common': ^7.0.0 || ^8.0.0 || ^9.0.0
       reflect-metadata: ^0.1.13
