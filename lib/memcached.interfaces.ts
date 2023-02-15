@@ -50,6 +50,8 @@ export type GetOptions = Pick<Processors, 'keyProcessor'> &
 
 export type IncrDecrOptions = Pick<Processors, 'keyProcessor'>;
 
+export type DelOptions = Pick<Processors, 'keyProcessor'>;
+
 export interface Parser {
   stringify: typeof stringify;
   parse: typeof parse;

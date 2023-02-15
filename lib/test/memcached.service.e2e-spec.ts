@@ -477,6 +477,22 @@ describe('MemcachedService (e2e)', () => {
         });
       });
 
+      describe('set & del', () => {
+        it('Should return true since cached key/value has been deleted', async () => {
+          await memcachedService.set('key', 'value');
+
+          const deleted = await memcachedService.del('key');
+
+          expect(deleted).toBe(true);
+        });
+
+        it('Should return false since key/value has never been cached', async () => {
+          const deleted = await memcachedService.del('key');
+
+          expect(deleted).toBe(false);
+        });
+      });
+
       afterEach(async () => {
         await memcachedService.flush();
       });

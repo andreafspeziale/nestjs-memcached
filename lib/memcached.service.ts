@@ -14,6 +14,7 @@ import type {
   Parser,
   IncrDecrOptions,
   AddOptions,
+  DelOptions,
 } from './memcached.interfaces';
 import { InjectMemcached, InjectMemcachedOptions } from './memcached.decorators';
 import { defaultWrapperProcessor } from './memcached.utils';
@@ -169,6 +170,16 @@ export class MemcachedService {
       : key;
 
     return this.client.decrAsync(processedKey, amount);
+  }
+
+  async del(key: string, options?: DelOptions): Promise<boolean> {
+    const processedKey = options?.keyProcessor
+      ? options.keyProcessor(key)
+      : this.keyProcessor
+      ? this.keyProcessor(key)
+      : key;
+
+    return this.client.delAsync(processedKey);
   }
 
   async flush(): Promise<boolean[]> {
