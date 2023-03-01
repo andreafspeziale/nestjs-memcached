@@ -27,7 +27,7 @@ specifiers:
   memcached: 2.2.2
   prettier: 2.8.4
   reflect-metadata: 0.1.13
-  release-it: 15.6.1
+  release-it: 15.7.0
   rimraf: 3.0.2
   rxjs: 7.8.0
   superjson: 1.12.2
@@ -49,7 +49,7 @@ devDependencies:
   '@nestjs/core': 9.3.9_q6agyr4hwia55oswpsa7zjxcpm
   '@nestjs/platform-express': 9.3.9_77foi4w27ghy47yutmnzv7krjy
   '@nestjs/testing': 9.3.9_yqmogfxzeu633isbftgaoi4ho4
-  '@release-it/conventional-changelog': 5.1.1_release-it@15.6.1
+  '@release-it/conventional-changelog': 5.1.1_release-it@15.7.0
   '@tsconfig/node18-strictest': 1.0.0
   '@types/bluebird': 3.5.38
   '@types/jest': 29.4.0
@@ -65,7 +65,7 @@ devDependencies:
   jest: 29.4.3
   lint-staged: 13.1.2
   prettier: 2.8.4
-  release-it: 15.6.1
+  release-it: 15.7.0
   rimraf: 3.0.2
   ts-jest: 29.0.5_orzzknleilowtsz34rkaotjvzm
   typescript: 4.9.5
@@ -1209,7 +1209,7 @@ packages:
       config-chain: 1.1.13
     dev: true
 
-  /@release-it/conventional-changelog/5.1.1_release-it@15.6.1:
+  /@release-it/conventional-changelog/5.1.1_release-it@15.7.0:
     resolution: {integrity: sha512-QtbDBe36dQfzexAfDYrbLPvd5Cb5bMWmLcjcGhCOWBss7fe1/gCjoxDULVz+7N7G5Nu2UMeBwHcUp/w8RDh5VQ==}
     engines: {node: '>=14'}
     peerDependencies:
@@ -1218,7 +1218,7 @@ packages:
       concat-stream: 2.0.0
       conventional-changelog: 3.1.25
       conventional-recommended-bump: 6.1.0
-      release-it: 15.6.1
+      release-it: 15.7.0
       semver: 7.3.8
     dev: true
 
@@ -5918,8 +5918,8 @@ packages:
       rc: 1.2.8
     dev: true
 
-  /release-it/15.6.1:
-    resolution: {integrity: sha512-oPJKP2yxMcA/TaGFnS5uB0spDSPiDXXd1yGKSSMQ2xutyiSs8X+1UahlJCF/xHnp01QwUqRv0fpsV9MFr2GKmQ==}
+  /release-it/15.7.0:
+    resolution: {integrity: sha512-/ajllmzQNuxXCrPySwx+MiR/nBHp8H+lTn42QFw9YlFPJQpLFwgMjCOFTB4hhuavi9jMbDpWcTPFy31QJgzNcw==}
     engines: {node: '>=14.9'}
     hasBin: true
     dependencies:
