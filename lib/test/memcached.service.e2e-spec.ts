@@ -417,6 +417,20 @@ describe('MemcachedService (e2e)', () => {
         });
       });
 
+      describe('set & incr & get', () => {
+        it('Should correclty increment the key numeric value', async () => {
+          const incr = 1;
+          const curr = 0;
+
+          await memcachedService.set('key', curr);
+          await memcachedService.incr('key', incr);
+
+          const result = await memcachedService.get('key');
+
+          expect(result).toBe(curr + incr);
+        });
+      });
+
       describe('set & decr', () => {
         it('Should correclty decrement the key numeric value', async () => {
           const decr = 1;
@@ -480,6 +494,20 @@ describe('MemcachedService (e2e)', () => {
             message: 'cannot increment or decrement non-numeric value',
             cause: new Error('cannot increment or decrement non-numeric value'),
           });
+        });
+      });
+
+      describe('set & decr & get', () => {
+        it('Should correclty decrement the key numeric value', async () => {
+          const decr = 1;
+          const curr = 1;
+
+          await memcachedService.set('key', curr);
+          await memcachedService.decr('key', decr);
+
+          const result = await memcachedService.get('key');
+
+          expect(result).toBe(curr - decr);
         });
       });
 
