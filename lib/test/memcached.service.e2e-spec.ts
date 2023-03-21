@@ -365,9 +365,11 @@ describe('MemcachedService (e2e)', () => {
         it('Should return false if cached key/value pair already exists', async () => {
           await memcachedService.add('key', 'value');
 
-          await expect(memcachedService.add('key', 'value2')).rejects.toThrow(
-            new Error('Item is not stored')
-          );
+          await expect(memcachedService.add('key', 'value2')).rejects.toThrowError({
+            name: 'OperationalError',
+            message: 'Item is not stored',
+            cause: new Error('Item is not stored'),
+          });
         });
       });
 
@@ -407,9 +409,25 @@ describe('MemcachedService (e2e)', () => {
         it('Should throw Error if key value is set but not numeric', async () => {
           await memcachedService.set('key', 'value');
 
-          await expect(memcachedService.incr('key', 1)).rejects.toThrow(
-            new Error('cannot increment or decrement non-numeric value')
-          );
+          await expect(memcachedService.incr('key', 1)).rejects.toThrowError({
+            name: 'OperationalError',
+            message: 'cannot increment or decrement non-numeric value',
+            cause: new Error('cannot increment or decrement non-numeric value'),
+          });
+        });
+      });
+
+      describe('set & incr & get', () => {
+        it('Should correclty increment the key numeric value', async () => {
+          const incr = 1;
+          const curr = 0;
+
+          await memcachedService.set('key', curr);
+          await memcachedService.incr('key', incr);
+
+          const result = await memcachedService.get('key');
+
+          expect(result).toBe(curr + incr);
         });
       });
 
@@ -471,9 +489,25 @@ describe('MemcachedService (e2e)', () => {
         it('Should throw Error if key value is set but not numeric', async () => {
           await memcachedService.set('key', 'value');
 
-          await expect(memcachedService.decr('key', 1)).rejects.toThrow(
-            new Error('cannot increment or decrement non-numeric value')
-          );
+          await expect(memcachedService.decr('key', 1)).rejects.toThrowError({
+            name: 'OperationalError',
+            message: 'cannot increment or decrement non-numeric value',
+            cause: new Error('cannot increment or decrement non-numeric value'),
+          });
+        });
+      });
+
+      describe('set & decr & get', () => {
+        it('Should correclty decrement the key numeric value', async () => {
+          const decr = 1;
+          const curr = 1;
+
+          await memcachedService.set('key', curr);
+          await memcachedService.decr('key', decr);
+
+          const result = await memcachedService.get('key');
+
+          expect(result).toBe(curr - decr);
         });
       });
 
