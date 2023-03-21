@@ -108,9 +108,11 @@ export class MemcachedService {
 
     const cached: T | undefined = await this.client.getAsync(processedKey);
 
-    return cached
-      ? (options?.superjson || this.memcachedModuleOptions.superjson) && typeof cached === 'string'
-        ? this.parser.parse<T>(cached)
+    return cached !== undefined
+      ? options?.superjson || this.memcachedModuleOptions.superjson
+        ? typeof cached === 'string'
+          ? this.parser.parse<T>(cached)
+          : cached
         : cached
       : null;
   }
