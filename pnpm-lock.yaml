@@ -4,7 +4,7 @@ specifiers:
   '@commitlint/cli': 17.6.5
   '@commitlint/config-conventional': 17.6.5
   '@nestjs/common': 9.3.11
-  '@nestjs/config': 2.3.2
+  '@nestjs/config': 2.3.3
   '@nestjs/core': 9.3.11
   '@nestjs/platform-express': 9.3.11
   '@nestjs/testing': 9.3.11
@@ -45,7 +45,7 @@ dependencies:
 devDependencies:
   '@commitlint/cli': 17.6.5
   '@commitlint/config-conventional': 17.6.5
-  '@nestjs/config': 2.3.2_5i3ldwcijg7tcjnigovmnxaffe
+  '@nestjs/config': 2.3.3_5i3ldwcijg7tcjnigovmnxaffe
   '@nestjs/core': 9.3.11_athbywszdzbn5zavk2rtmf5ypm
   '@nestjs/platform-express': 9.3.11_xiomoxhobbq2lrbq7qad5cle4i
   '@nestjs/testing': 9.3.11_itcvwav43ind2ixbuvvdffcfcu
@@ -952,15 +952,15 @@ packages:
       tslib: 2.5.0
       uid: 2.0.1
 
-  /@nestjs/config/2.3.2_5i3ldwcijg7tcjnigovmnxaffe:
-    resolution: {integrity: sha512-VtGV8PBpxzMzz68kdxTWqPm9v7SYCSZXQ0tC72AMNnjdmU+CVjUSLpEpdnm0XcWHxE1nV6wSI3HZxsATIV4ZxA==}
+  /@nestjs/config/2.3.3_5i3ldwcijg7tcjnigovmnxaffe:
+    resolution: {integrity: sha512-WcBA+0sv8euzKoYpxsCAdMzADxZEeUq8ulD+T+7QBNF0Yha6KC9edkXzk5xTJcanrKL9qnP0kboAXONscHb/Kw==}
     peerDependencies:
       '@nestjs/common': ^7.0.0 || ^8.0.0 || ^9.0.0
       reflect-metadata: ^0.1.13
       rxjs: ^6.0.0 || ^7.2.0
     dependencies:
       '@nestjs/common': 9.3.11_mnr6j2del53muneqly5h4y27ai
-      dotenv: 16.0.3
+      dotenv: 16.1.4
       dotenv-expand: 10.0.0
       lodash: 4.17.21
       reflect-metadata: 0.1.13
@@ -2735,8 +2735,8 @@ packages:
     engines: {node: '>=12'}
     dev: true
 
-  /dotenv/16.0.3:
-    resolution: {integrity: sha512-7GO6HghkA5fYG9TYnNxi14/7K9f5occMlp3zXAuSxn7CKCxt9xbNWG7yF8hTCSUchlfWSe3uLmlPfigevRItzQ==}
+  /dotenv/16.1.4:
+    resolution: {integrity: sha512-m55RtE8AsPeJBpOIFKihEmqUcoVncQIwo7x9U8ZwLEZw9ZpXboz2c+rvog+jUaJvVrZ5kBOeYQBX5+8Aa/OZQw==}
     engines: {node: '>=12'}
     dev: true
 
