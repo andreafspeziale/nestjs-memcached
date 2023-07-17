@@ -30,7 +30,7 @@ specifiers:
   release-it: 15.11.0
   rimraf: 3.0.2
   rxjs: 7.8.0
-  superjson: 1.12.2
+  superjson: 1.13.1
   ts-jest: 29.1.1
   typescript: 4.9.5
 
@@ -40,7 +40,7 @@ dependencies:
   memcached: 2.2.2
   reflect-metadata: 0.1.13
   rxjs: 7.8.0
-  superjson: 1.12.2
+  superjson: 1.13.1
 
 devDependencies:
   '@commitlint/cli': 17.6.6
@@ -6490,8 +6490,8 @@ packages:
     engines: {node: '>=8'}
     dev: true
 
-  /superjson/1.12.2:
-    resolution: {integrity: sha512-ugvUo9/WmvWOjstornQhsN/sR9mnGtWGYeTxFuqLb4AiT4QdUavjGFRALCPKWWnAiUJ4HTpytj5e0t5HoMRkXg==}
+  /superjson/1.13.1:
+    resolution: {integrity: sha512-AVH2eknm9DEd3qvxM4Sq+LTCkSXE2ssfh1t11MHMXyYXFQyQ1HLgVvV+guLTsaQnJU3gnaVo34TohHPulY/wLg==}
     engines: {node: '>=10'}
     dependencies:
       copy-anything: 3.0.2
