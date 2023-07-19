@@ -1,5 +1,12 @@
 
 
+## [3.4.3](https://github.com/andreafspeziale/nestjs-memcached/compare/3.4.2...3.4.3) (2023-07-19)
+
+
+### Miscellaneous
+
+* action cleanup ([a8b7193](https://github.com/andreafspeziale/nestjs-memcached/commit/a8b719307d131cf8570c669d19e99baf9b530e3f))
+
 ## [3.4.2](https://github.com/andreafspeziale/nestjs-memcached/compare/3.4.1...3.4.2) (2023-07-19)
 
 
