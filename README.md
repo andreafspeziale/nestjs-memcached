@@ -36,7 +36,7 @@ yarn add @andreafspeziale/nestjs-memcached
 ### pnpm
 
 ```sh
-pnpm install @andreafspeziale/nestjs-memcached
+pnpm add @andreafspeziale/nestjs-memcached
 ```
 
 ## How to use?
