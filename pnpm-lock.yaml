@@ -10,7 +10,7 @@ specifiers:
   '@nestjs/testing': 9.4.3
   '@release-it/conventional-changelog': 5.1.1
   '@tsconfig/node18-strictest': 1.0.0
-  '@types/bluebird': 3.5.38
+  '@types/bluebird': 3.5.39
   '@types/jest': 29.5.4
   '@types/memcached': 2.2.7
   '@typescript-eslint/eslint-plugin': 5.62.0
@@ -51,7 +51,7 @@ devDependencies:
   '@nestjs/testing': 9.4.3_c2suh6ay6qzrduk6sfgpcvxpvi
   '@release-it/conventional-changelog': 5.1.1_release-it@15.11.0
   '@tsconfig/node18-strictest': 1.0.0
-  '@types/bluebird': 3.5.38
+  '@types/bluebird': 3.5.39
   '@types/jest': 29.5.4
   '@types/memcached': 2.2.7
   '@typescript-eslint/eslint-plugin': 5.62.0_m6w5juxrikl2f6jpigg44ursuy
@@ -1323,8 +1323,8 @@ packages:
       '@babel/types': 7.20.2
     dev: true
 
-  /@types/bluebird/3.5.38:
-    resolution: {integrity: sha512-yR/Kxc0dd4FfwtEoLZMoqJbM/VE/W7hXn/MIjb+axcwag0iFmSPK7OBUZq1YWLynJUoWQkfUrI7T0HDqGApNSg==}
+  /@types/bluebird/3.5.39:
+    resolution: {integrity: sha512-0h2lKudcFwHih8NHAgt/uyAIUQDO0AdfJYlWBXD8r+gFDulUi2CMZoQSh2Q5ol1FMaHV9k7/4HtcbA8ABtexmA==}
     dev: true
 
   /@types/graceful-fs/4.1.5:
