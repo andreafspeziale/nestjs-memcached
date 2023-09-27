@@ -54,7 +54,7 @@
     "@tsconfig/node18-strictest": "1.0.0",
     "@types/bluebird": "3.5.39",
     "@types/jest": "29.5.5",
-    "@types/memcached": "2.2.7",
+    "@types/memcached": "2.2.8",
     "@typescript-eslint/eslint-plugin": "5.62.0",
     "@typescript-eslint/parser": "5.62.0",
     "eslint": "8.50.0",
