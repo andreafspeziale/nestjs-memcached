@@ -41,7 +41,7 @@
     "memcached": "2.2.2",
     "reflect-metadata": "0.1.13",
     "rxjs": "7.8.1",
-    "superjson": "1.13.1"
+    "superjson": "1.13.3"
   },
   "devDependencies": {
     "@commitlint/cli": "17.7.1",
