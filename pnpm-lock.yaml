@@ -11,7 +11,7 @@ specifiers:
   '@release-it/conventional-changelog': 5.1.1
   '@tsconfig/node18-strictest': 1.0.0
   '@types/bluebird': 3.5.41
-  '@types/jest': 29.5.5
+  '@types/jest': 29.5.6
   '@types/memcached': 2.2.8
   '@typescript-eslint/eslint-plugin': 5.62.0
   '@typescript-eslint/parser': 5.62.0
@@ -52,7 +52,7 @@ devDependencies:
   '@release-it/conventional-changelog': 5.1.1_release-it@15.11.0
   '@tsconfig/node18-strictest': 1.0.0
   '@types/bluebird': 3.5.41
-  '@types/jest': 29.5.5
+  '@types/jest': 29.5.6
   '@types/memcached': 2.2.8
   '@typescript-eslint/eslint-plugin': 5.62.0_dslcjblstjudtxhhgmfq4n2zxy
   '@typescript-eslint/parser': 5.62.0_o3et2ndnedfdhen34uq7t66m3y
@@ -704,14 +704,14 @@ packages:
       '@jest/test-result': 29.7.0
       '@jest/transform': 29.7.0
       '@jest/types': 29.6.3
-      '@types/node': 20.4.7
+      '@types/node': 20.5.1
       ansi-escapes: 4.3.2
       chalk: 4.1.2
       ci-info: 3.5.0
       exit: 0.1.2
       graceful-fs: 4.2.10
       jest-changed-files: 29.7.0
-      jest-config: 29.7.0_@types+node@20.4.7
+      jest-config: 29.7.0_@types+node@20.5.1
       jest-haste-map: 29.7.0
       jest-message-util: 29.7.0
       jest-regex-util: 29.6.3
@@ -887,7 +887,7 @@ packages:
       '@jest/schemas': 29.6.3
       '@types/istanbul-lib-coverage': 2.0.4
       '@types/istanbul-reports': 3.0.1
-      '@types/node': 20.4.7
+      '@types/node': 20.5.1
       '@types/yargs': 17.0.13
       chalk: 4.1.2
     dev: true
@@ -1346,8 +1346,8 @@ packages:
       '@types/istanbul-lib-report': 3.0.0
     dev: true
 
-  /@types/jest/29.5.5:
-    resolution: {integrity: sha512-ebylz2hnsWR9mYvmBFbXJXr+33UPc4+ZdxyDXh5w0FlPBTfCVN3wPL+kuOiQt3xvrK419v7XWeAs+AeOksafXg==}
+  /@types/jest/29.5.6:
+    resolution: {integrity: sha512-/t9NnzkOpXb4Nfvg17ieHE6EeSjDS2SGSpNYfoLbUAeL/EOueU/RSdOWFpfQTXBEM7BguYW1XQ0EbM+6RlIh6w==}
     dependencies:
       expect: 29.7.0
       pretty-format: 29.7.0
@@ -4541,7 +4541,7 @@ packages:
       - supports-color
     dev: true
 
-  /jest-config/29.7.0_@types+node@20.4.7:
+  /jest-config/29.7.0_@types+node@20.5.1:
     resolution: {integrity: sha512-uXbpfeQ7R6TZBqI3/TxCU4q4ttk3u0PJeC+E0zbfSoSjq6bJ7buBPxzQPL0ifrkY4DNu4JUdk0ImlBUYi840eQ==}
     engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
     peerDependencies:
@@ -4556,7 +4556,7 @@ packages:
       '@babel/core': 7.20.2
       '@jest/test-sequencer': 29.7.0
       '@jest/types': 29.6.3
-      '@types/node': 20.4.7
+      '@types/node': 20.5.1
       babel-jest: 29.7.0_@babel+core@7.20.2
       chalk: 4.1.2
       ci-info: 3.5.0
@@ -4833,7 +4833,7 @@ packages:
     engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
     dependencies:
       '@jest/types': 29.6.3
-      '@types/node': 20.4.7
+      '@types/node': 20.5.1
       chalk: 4.1.2
       ci-info: 3.5.0
       graceful-fs: 4.2.10
