@@ -52,7 +52,7 @@
     "@nestjs/testing": "9.4.3",
     "@release-it/conventional-changelog": "5.1.1",
     "@tsconfig/node18-strictest": "1.0.0",
-    "@types/bluebird": "3.5.41",
+    "@types/bluebird": "3.5.42",
     "@types/jest": "29.5.7",
     "@types/memcached": "2.2.10",
     "@typescript-eslint/eslint-plugin": "5.62.0",
