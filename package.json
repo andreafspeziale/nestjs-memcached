@@ -32,14 +32,14 @@
   ],
   "peerDependencies": {
     "@nestjs/common": "9.x",
-    "reflect-metadata": "0.1.x",
+    "reflect-metadata": "0.1.x || 0.2.x",
     "rxjs": "7.x"
   },
   "dependencies": {
     "@nestjs/common": "9.4.3",
     "bluebird": "3.7.2",
     "memcached": "2.2.2",
-    "reflect-metadata": "0.1.13",
+    "reflect-metadata": "0.2.0",
     "rxjs": "7.8.1",
     "superjson": "1.13.1"
   },
