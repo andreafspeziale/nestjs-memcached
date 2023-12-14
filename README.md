@@ -1,12 +1,14 @@
 <div align="center">
   <p>
-    <a href="https://memcached.org/" target="blank">
+    <!-- <a href="https://memcached.org/" target="blank">
       <img src="./assets/memcached-logo.png" width="160" alt="Memcached Logo" />
-    </a>
+    </a> -->
+    <img src="./assets/memcached-logo.png" width="160" alt="Memcached Logo" />
     <b></b>
-    <a href="https://nestjs.com/" target="blank">
+    <!-- <a href="https://nestjs.com/" target="blank">
       <img src="https://nestjs.com/img/logo_text.svg" width="320" alt="Nest Logo" />
-    </a>
+    </a> -->
+    <img src="https://nestjs.com/img/logo_text.svg" width="320" alt="Nest Logo" />
   </p>
   <p>
     <a href="https://memcached.org/" target="blank">Memcached</a> module and service for <a href="https://github.com/nestjs/nest" target="blank">Nest</a>,<br>
