@@ -31,7 +31,7 @@ specifiers:
   rimraf: 3.0.2
   rxjs: 7.8.1
   superjson: 1.13.3
-  ts-jest: 29.2.3
+  ts-jest: 29.2.4
   typescript: 4.9.5
 
 dependencies:
@@ -67,7 +67,7 @@ devDependencies:
   prettier: 2.8.8
   release-it: 15.11.0
   rimraf: 3.0.2
-  ts-jest: 29.2.3_67xnt3v64q2pgz6kguni4h37hu
+  ts-jest: 29.2.4_67xnt3v64q2pgz6kguni4h37hu
   typescript: 4.9.5
 
 packages:
@@ -6822,8 +6822,8 @@ packages:
     engines: {node: '>=8'}
     dev: true
 
-  /ts-jest/29.2.3_67xnt3v64q2pgz6kguni4h37hu:
-    resolution: {integrity: sha512-yCcfVdiBFngVz9/keHin9EnsrQtQtEu3nRykNy9RVp+FiPFFbPJ3Sg6Qg4+TkmH0vMP5qsTKgXSsk80HRwvdgQ==}
+  /ts-jest/29.2.4_67xnt3v64q2pgz6kguni4h37hu:
+    resolution: {integrity: sha512-3d6tgDyhCI29HlpwIq87sNuI+3Q6GLTTCeYRHCs7vDz+/3GCMwEtV9jezLyl4ZtnBgx00I7hm8PCP8cTksMGrw==}
     engines: {node: ^14.15.0 || ^16.10.0 || ^18.0.0 || >=20.0.0}
     hasBin: true
     peerDependencies:
