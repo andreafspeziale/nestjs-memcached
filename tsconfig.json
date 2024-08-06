@@ -1,5 +1,9 @@
 {
-  "extends": "@tsconfig/node18-strictest/tsconfig.json",
+  "extends": [
+    "@tsconfig/recommended/tsconfig.json",
+    "@tsconfig/strictest/tsconfig.json",
+    "@tsconfig/node20/tsconfig.json"
+  ],
   "compilerOptions": {
     "experimentalDecorators": true,
     "removeComments": true,
