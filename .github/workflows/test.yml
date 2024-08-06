@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       memcached:
-        image: bitnami/memcached:1.6.21
+        image: bitnami/memcached:1.6.29
         ports:
           - 11211:11211
     steps:
@@ -18,11 +18,11 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 18.5.0
+          node-version: 20.16.0
       - name: Install pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 7
+          version: 9
           run_install: false
       - name: Get pnpm store directory
         id: pnpm-cache
