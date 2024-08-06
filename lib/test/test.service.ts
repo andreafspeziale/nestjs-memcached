@@ -7,7 +7,7 @@ export class TestService {
   constructor(
     @InjectMemcachedOptions()
     private readonly memcachedModuleOptions: MemcachedModuleOptions,
-    @InjectMemcached() private readonly memcachedClient: MemcachedClient
+    @InjectMemcached() private readonly memcachedClient: MemcachedClient,
   ) {}
 
   getConfig(): MemcachedModuleOptions {

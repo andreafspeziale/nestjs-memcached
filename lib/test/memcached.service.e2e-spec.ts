@@ -535,6 +535,6 @@ describe('MemcachedService (e2e)', () => {
         memcachedService.end();
         await app.close();
       });
-    })
+    }),
   );
 });

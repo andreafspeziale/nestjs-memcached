@@ -9,7 +9,7 @@ export const createMemcachedClient = ({
   connections = [],
 }: Pick<MemcachedModuleOptions, 'connections'>): MemcachedClient =>
   new MemcachedClient(
-    connections.map((c) => (c.port ? `${c.host}:${c.port}` : `${c.host}`)).join(',')
+    connections.map((c) => (c.port ? `${c.host}:${c.port}` : `${c.host}`)).join(','),
   );
 
 export const defaultWrapperProcessor: WrapperProcessor = ({ value, ttl, ttr }) => ({

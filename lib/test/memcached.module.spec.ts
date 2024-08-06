@@ -147,6 +147,6 @@ describe('MemcachedService (e2e)', () => {
       afterEach(async () => {
         await app.close();
       });
-    })
+    }),
   );
 });

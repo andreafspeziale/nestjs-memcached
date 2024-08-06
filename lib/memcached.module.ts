@@ -89,7 +89,7 @@ export class MemcachedModule {
     return {
       provide: getMemcachedModuleOptionsToken(),
       useFactory: async (
-        optionsFactory: MemcachedModuleOptionsFactory
+        optionsFactory: MemcachedModuleOptionsFactory,
       ): Promise<MemcachedModuleOptions> => optionsFactory.createMemcachedModuleOptions(),
       inject: [options.useExisting || options.useClass],
     };

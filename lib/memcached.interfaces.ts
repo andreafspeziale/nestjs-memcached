@@ -18,7 +18,7 @@ export interface MemcachedConnections {
 export type BaseWrapper<T = unknown> = WrappedValue<T> & CachingOptions;
 
 export type WrapperProcessor<T = unknown, R = BaseWrapper<T>> = (
-  p: { value: T } & CachingOptions
+  p: { value: T } & CachingOptions,
 ) => R;
 
 export type KeyProcessor = (key: string) => string;
