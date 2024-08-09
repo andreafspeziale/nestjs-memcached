@@ -1,4 +1,4 @@
-import type MemcachedClient from 'memcached';
+import MemcachedClient from 'memcached';
 import { Injectable } from '@nestjs/common';
 import { InjectMemcached, InjectMemcachedOptions, MemcachedModuleOptions } from '../';
 

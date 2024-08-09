@@ -1,8 +1,8 @@
 import b from 'bluebird';
 import { Injectable } from '@nestjs/common';
-import type * as MemcachedClient from 'memcached';
+import MemcachedClient from 'memcached';
 import { stringify, parse } from 'superjson';
-import type {
+import {
   CachingOptions,
   GetOptions,
   KeyProcessor,

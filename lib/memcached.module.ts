@@ -1,6 +1,6 @@
 import { DynamicModule, Global, Provider } from '@nestjs/common';
-import type MemcachedClient from 'memcached';
-import type {
+import MemcachedClient from 'memcached';
+import {
   MemcachedModuleAsyncOptions,
   MemcachedModuleOptions,
   MemcachedModuleOptionsFactory,

@@ -1,5 +1,5 @@
-import type { ModuleMetadata, Type } from '@nestjs/common';
-import type { stringify, parse } from 'superjson';
+import { ModuleMetadata, Type } from '@nestjs/common';
+import { stringify, parse } from 'superjson';
 
 export interface CachingOptions {
   ttl: number;

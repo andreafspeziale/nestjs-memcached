@@ -1,6 +1,6 @@
 import MemcachedClient from 'memcached';
 import { MEMCACHED_MODULE_OPTIONS_TOKEN, MEMCACHED_CLIENT_TOKEN } from './memcached.constants';
-import type { MemcachedModuleOptions, WrapperProcessor } from './memcached.interfaces';
+import { MemcachedModuleOptions, WrapperProcessor } from './memcached.interfaces';
 
 export const getMemcachedModuleOptionsToken = (): string => MEMCACHED_MODULE_OPTIONS_TOKEN;
 export const getMemcachedClientToken = (): string => MEMCACHED_CLIENT_TOKEN;
