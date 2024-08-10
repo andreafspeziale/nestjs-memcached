@@ -1,8 +1,8 @@
 import b from 'bluebird';
 import { Injectable } from '@nestjs/common';
-import type * as MemcachedClient from 'memcached';
 import { stringify, parse } from 'superjson';
-import type {
+import {
+  MemcachedClient,
   CachingOptions,
   GetOptions,
   KeyProcessor,
@@ -29,7 +29,7 @@ export class MemcachedService {
   constructor(
     @InjectMemcachedOptions()
     private readonly memcachedModuleOptions: MemcachedModuleOptions,
-    @InjectMemcached() private readonly memcachedClient: MemcachedClient
+    @InjectMemcached() private readonly memcachedClient: MemcachedClient,
   ) {
     this.client = b.promisifyAll(this.memcachedClient);
 
@@ -48,7 +48,7 @@ export class MemcachedService {
   async setWithMeta<T, R = WrappedValue<T> & CachingOptions>(
     key: string,
     value: T,
-    options?: SetWithMetaOptions<T, R>
+    options?: SetWithMetaOptions<T, R>,
   ): Promise<boolean> {
     const ttl = options?.ttl || this.memcachedModuleOptions.ttl;
 
@@ -58,15 +58,15 @@ export class MemcachedService {
       ...(options?.ttr
         ? { ttr: options?.ttr }
         : this.memcachedModuleOptions.ttr
-        ? { ttr: this.memcachedModuleOptions.ttr }
-        : {}),
+          ? { ttr: this.memcachedModuleOptions.ttr }
+          : {}),
     };
 
     const processedKey = options?.keyProcessor
       ? options.keyProcessor(key)
       : this.keyProcessor
-      ? this.keyProcessor(key)
-      : key;
+        ? this.keyProcessor(key)
+        : key;
 
     const wrappedValue = options?.wrapperProcessor
       ? options.wrapperProcessor(wrapperProcessorPayload)
@@ -84,8 +84,8 @@ export class MemcachedService {
     const processedKey = options?.keyProcessor
       ? options.keyProcessor(key)
       : this.keyProcessor
-      ? this.keyProcessor(key)
-      : key;
+        ? this.keyProcessor(key)
+        : key;
 
     const parsed =
       (options?.superjson || this.memcachedModuleOptions.superjson) && typeof value !== 'number'
@@ -95,7 +95,7 @@ export class MemcachedService {
     return this.client.setAsync(
       processedKey,
       parsed,
-      options?.ttl || this.memcachedModuleOptions.ttl
+      options?.ttl || this.memcachedModuleOptions.ttl,
     );
   }
 
@@ -103,8 +103,8 @@ export class MemcachedService {
     const processedKey = options?.keyProcessor
       ? options.keyProcessor(key)
       : this.keyProcessor
-      ? this.keyProcessor(key)
-      : key;
+        ? this.keyProcessor(key)
+        : key;
 
     const cached: T | undefined = await this.client.getAsync(processedKey);
 
@@ -126,8 +126,8 @@ export class MemcachedService {
     const processedKey = options?.keyProcessor
       ? options.keyProcessor(key)
       : this.keyProcessor
-      ? this.keyProcessor(key)
-      : key;
+        ? this.keyProcessor(key)
+        : key;
 
     const parsed =
       (options?.superjson || this.memcachedModuleOptions.superjson) && typeof value !== 'number'
@@ -137,7 +137,7 @@ export class MemcachedService {
     return this.client.addAsync(
       processedKey,
       parsed,
-      options?.ttl || this.memcachedModuleOptions.ttl
+      options?.ttl || this.memcachedModuleOptions.ttl,
     );
   }
 
@@ -151,8 +151,8 @@ export class MemcachedService {
     const processedKey = options?.keyProcessor
       ? options.keyProcessor(key)
       : this.keyProcessor
-      ? this.keyProcessor(key)
-      : key;
+        ? this.keyProcessor(key)
+        : key;
 
     return this.client.incrAsync(processedKey, amount);
   }
@@ -168,8 +168,8 @@ export class MemcachedService {
     const processedKey = options?.keyProcessor
       ? options.keyProcessor(key)
       : this.keyProcessor
-      ? this.keyProcessor(key)
-      : key;
+        ? this.keyProcessor(key)
+        : key;
 
     return this.client.decrAsync(processedKey, amount);
   }
@@ -178,8 +178,8 @@ export class MemcachedService {
     const processedKey = options?.keyProcessor
       ? options.keyProcessor(key)
       : this.keyProcessor
-      ? this.keyProcessor(key)
-      : key;
+        ? this.keyProcessor(key)
+        : key;
 
     return this.client.delAsync(processedKey);
   }

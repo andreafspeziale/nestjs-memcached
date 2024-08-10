@@ -103,7 +103,7 @@ import { AppController } from './app.controller';
       ...
     }),
     MemcachedModule.forRootAsync({
-      useFactory: (configService: ConfigService<Config>) => configService.get('memcached'),
+      useFactory: (configService: ConfigService<Config, true>) => configService.get('memcached'),
       inject: [ConfigService],
     }),
   ],
@@ -113,18 +113,19 @@ export class AppModule {}
 ```
 
 ### Decorators
+> use the client and create your own service
 
 #### InjectMemcachedOptions() and InjectMemcached()
 
 ```ts
 import { Injectable } from '@nestjs/common';
-import { InjectMemcachedOptions, InjectMemcached } from '@andreafspeziale/nestjs-memcached';
+import { InjectMemcachedOptions, InjectMemcached, MemcachedClient } from '@andreafspeziale/nestjs-memcached';
 
 @Injectable()
 export class SampleService {
   constructor(
     @InjectMemcachedOptions()
-    private readonly memcachedModuleOptions: MemcachedModuleOptions,
+    private readonly memcachedModuleOptions: MemcachedModuleOptions, // mostly for showcase purposes
     @InjectMemcached() private readonly memcachedClient: MemcachedClient
   ) {}
 
@@ -133,6 +134,7 @@ export class SampleService {
 ```
 
 ### Service
+> out of the box service with a set of features
 
 #### MemcachedService
 
@@ -169,6 +171,55 @@ The provided `MemcachedService` is an opinionated wrapper around [memcached](htt
 
 So each time you get some cached data it will contain additional properties in order to help you decide whatever business logic needs to be applied.
 
+### Health
+
+I usually expose an `/healthz` controller from my microservices in order to check third parties connection.
+
+### HealthController
+
+```ts
+import { Controller, Get, VERSION_NEUTRAL } from '@nestjs/common';
+import {
+  HealthCheckService,
+  HealthCheckResult,
+  HealthIndicatorResult,
+  MicroserviceHealthIndicator,
+} from '@nestjs/terminus';
+import { Transport } from '@nestjs/microservices';
+import { Config, MemcachedConfig } from '../config';
+import { ConfigService } from '@nestjs/config';
+
+@Controller({
+  path: 'healthz',
+  version: VERSION_NEUTRAL,
+})
+export class HealthController {
+  constructor(
+    private readonly health: HealthCheckService,
+    private readonly microservice: MicroserviceHealthIndicator,
+    private readonly configService: ConfigService<Config, true>,
+  ) {}
+
+  @Get()
+  check(): Promise<HealthCheckResult> {
+    return this.health.check([
+      (): Promise<HealthIndicatorResult> =>
+        this.microservice.pingCheck('memcached', {
+          transport: Transport.TCP,
+          options: {
+            host: this.configService.get<MemcachedConfig['memcached']>(
+              'memcached',
+            ).connections?.[0].host,
+            port: this.configService.get<MemcachedConfig['memcached']>(
+              'memcached',
+            ).connections?.[0].port,
+          },
+        }),
+    ]);
+  }
+}
+```
+
 ## Test
 
 - `docker compose -f docker-compose.test.yml up -d`
@@ -183,3 +234,9 @@ So each time you get some cached data it will contain additional properties in o
 ## License
 
 nestjs-memcached [MIT licensed](LICENSE).
+
+<!-- TODO
+- review readme, maybe add something about health
+- chatgpt for global by config module
+- memcached config
+-->

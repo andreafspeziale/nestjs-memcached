@@ -1,5 +1,8 @@
-import type { ModuleMetadata, Type } from '@nestjs/common';
-import type { stringify, parse } from 'superjson';
+import { ModuleMetadata, Type } from '@nestjs/common';
+import Memcached from 'memcached';
+import { stringify, parse } from 'superjson';
+
+export type MemcachedClient = Memcached;
 
 export interface CachingOptions {
   ttl: number;
@@ -18,7 +21,7 @@ export interface MemcachedConnections {
 export type BaseWrapper<T = unknown> = WrappedValue<T> & CachingOptions;
 
 export type WrapperProcessor<T = unknown, R = BaseWrapper<T>> = (
-  p: { value: T } & CachingOptions
+  p: { value: T } & CachingOptions,
 ) => R;
 
 export type KeyProcessor = (key: string) => string;

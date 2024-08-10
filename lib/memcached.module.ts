@@ -1,6 +1,6 @@
 import { DynamicModule, Global, Provider } from '@nestjs/common';
-import type MemcachedClient from 'memcached';
-import type {
+import {
+  MemcachedClient,
   MemcachedModuleAsyncOptions,
   MemcachedModuleOptions,
   MemcachedModuleOptionsFactory,
@@ -89,7 +89,7 @@ export class MemcachedModule {
     return {
       provide: getMemcachedModuleOptionsToken(),
       useFactory: async (
-        optionsFactory: MemcachedModuleOptionsFactory
+        optionsFactory: MemcachedModuleOptionsFactory,
       ): Promise<MemcachedModuleOptions> => optionsFactory.createMemcachedModuleOptions(),
       inject: [options.useExisting || options.useClass],
     };
