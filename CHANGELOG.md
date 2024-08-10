@@ -1,5 +1,20 @@
 
 
+## [3.4.5](https://github.com/andreafspeziale/nestjs-memcached/compare/3.4.4...3.4.5) (2024-08-10)
+
+
+### Bug Fixes
+
+* expose memcached client ([f1ce85b](https://github.com/andreafspeziale/nestjs-memcached/commit/f1ce85b638c731035ce8deb26698a4d6afb6599a))
+
+
+### Miscellaneous
+
+* lint/format ([6e24f5e](https://github.com/andreafspeziale/nestjs-memcached/commit/6e24f5ebf92aa7041cef04dbc82458fbce38285f))
+* type keyword rekt ([4d6d814](https://github.com/andreafspeziale/nestjs-memcached/commit/4d6d8144244fee25e9149dfc615b710e9d88f231))
+* update dependency @commitlint/cli to v19.4.0 ([1b0506b](https://github.com/andreafspeziale/nestjs-memcached/commit/1b0506b050963cb8cd24d84fb09453a803655019))
+* update pnpm to v9.7.0 ([9375559](https://github.com/andreafspeziale/nestjs-memcached/commit/9375559835c3d23efe83a7f2102d53513fc4c03d))
+
 ## [3.4.4](https://github.com/andreafspeziale/nestjs-memcached/compare/3.4.3...3.4.4) (2024-08-06)
 
 
