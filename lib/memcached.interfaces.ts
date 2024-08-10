@@ -1,5 +1,8 @@
 import { ModuleMetadata, Type } from '@nestjs/common';
+import Memcached from 'memcached';
 import { stringify, parse } from 'superjson';
+
+export type MemcachedClient = Memcached;
 
 export interface CachingOptions {
   ttl: number;
