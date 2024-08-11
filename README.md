@@ -234,9 +234,3 @@ export class HealthController {
 ## License
 
 nestjs-memcached [MIT licensed](LICENSE).
-
-<!-- TODO
-- review readme, maybe add something about health
-- chatgpt for global by config module
-- memcached config
--->
