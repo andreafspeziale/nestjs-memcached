@@ -49,10 +49,11 @@ The module is <a href="https://docs.nestjs.com/modules#global-modules" target="b
 
 #### MemcachedModule.forRoot(options)
 
+`src/core/core.module.ts`
+
 ```ts
 import { Module } from '@nestjs/common';
 import { MemcachedModule } from '@andreafspeziale/nestjs-memcached';
-import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -75,9 +76,9 @@ import { AppController } from './app.controller';
       }),
     }),
   ],
-  controllers: [AppController],
+  ...
 })
-export class AppModule {}
+export class CoreModule {}
 ```
 
 - For signle connection you can omit the `connections` property.
@@ -90,12 +91,13 @@ export class AppModule {}
 
 #### MemcachedModule.forRootAsync(options)
 
+`src/core/core.module.ts`
+
 ```ts
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MemcachedModule } from '@andreafspeziale/nestjs-memcached';
 import { Config } from './config';
-import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -107,9 +109,9 @@ import { AppController } from './app.controller';
       inject: [ConfigService],
     }),
   ],
-  controllers: [AppController],
+  ...
 })
-export class AppModule {}
+export class CoreModule {}
 ```
 
 ### Decorators
@@ -117,12 +119,14 @@ export class AppModule {}
 
 #### InjectMemcachedOptions() and InjectMemcached()
 
+`src/samples/samples.service.ts`
+
 ```ts
 import { Injectable } from '@nestjs/common';
 import { InjectMemcachedOptions, InjectMemcached, MemcachedClient } from '@andreafspeziale/nestjs-memcached';
 
 @Injectable()
-export class SampleService {
+export class SamplesService {
   constructor(
     @InjectMemcachedOptions()
     private readonly memcachedModuleOptions: MemcachedModuleOptions, // Showcase purposes
@@ -138,12 +142,14 @@ export class SampleService {
 
 #### MemcachedService
 
+`src/samples/samples.facade.ts`
+
 ```ts
 import { MemcachedService } from '@andreafspeziale/nestjs-memcached';
 import { SampleReturnType, CachedItemType } from './interfaces'
 
 @Injectable()
-export class SampleFacade {
+export class SamplesFacade {
   constructor(
     private readonly memcachedService: MemcachedService
   ) {}
@@ -175,7 +181,9 @@ So each time you get some cached data it will contain additional properties in o
 
 I usually expose an `/healthz` controller from my microservices in order to check third parties connection.
 
-### HealthController
+#### HealthController
+
+`src/health/health.controller.ts`
 
 ```ts
 import { Controller, Get } from '@nestjs/common';
