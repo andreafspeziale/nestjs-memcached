@@ -41,9 +41,10 @@
   "devDependencies": {
     "@commitlint/cli": "^19.3.0",
     "@commitlint/config-conventional": "^19.2.2",
-    "@nestjs/common": "^10.3.10",
+    "@nestjs/common": "^10.4.0",
     "@nestjs/config": "^3.2.3",
-    "@nestjs/testing": "^10.3.10",
+    "@nestjs/platform-express": "^10.4.0",
+    "@nestjs/testing": "^10.4.0",
     "@release-it/conventional-changelog": "8.0.1",
     "@tsconfig/node20": "20.1.4",
     "@tsconfig/recommended": "1.0.7",
