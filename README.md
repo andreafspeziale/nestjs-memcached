@@ -49,10 +49,11 @@ The module is <a href="https://docs.nestjs.com/modules#global-modules" target="b
 
 #### MemcachedModule.forRoot(options)
 
+`src/core/core.module.ts`
+
 ```ts
 import { Module } from '@nestjs/common';
 import { MemcachedModule } from '@andreafspeziale/nestjs-memcached';
-import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -75,9 +76,9 @@ import { AppController } from './app.controller';
       }),
     }),
   ],
-  controllers: [AppController],
+  ...
 })
-export class AppModule {}
+export class CoreModule {}
 ```
 
 - For signle connection you can omit the `connections` property.
@@ -90,12 +91,13 @@ export class AppModule {}
 
 #### MemcachedModule.forRootAsync(options)
 
+`src/core/core.module.ts`
+
 ```ts
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MemcachedModule } from '@andreafspeziale/nestjs-memcached';
 import { Config } from './config';
-import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -107,9 +109,9 @@ import { AppController } from './app.controller';
       inject: [ConfigService],
     }),
   ],
-  controllers: [AppController],
+  ...
 })
-export class AppModule {}
+export class CoreModule {}
 ```
 
 ### Decorators
@@ -117,15 +119,17 @@ export class AppModule {}
 
 #### InjectMemcachedOptions() and InjectMemcached()
 
+`src/samples/samples.service.ts`
+
 ```ts
 import { Injectable } from '@nestjs/common';
 import { InjectMemcachedOptions, InjectMemcached, MemcachedClient } from '@andreafspeziale/nestjs-memcached';
 
 @Injectable()
-export class SampleService {
+export class SamplesService {
   constructor(
     @InjectMemcachedOptions()
-    private readonly memcachedModuleOptions: MemcachedModuleOptions, // mostly for showcase purposes
+    private readonly memcachedModuleOptions: MemcachedModuleOptions, // Showcase purposes
     @InjectMemcached() private readonly memcachedClient: MemcachedClient
   ) {}
 
@@ -138,12 +142,14 @@ export class SampleService {
 
 #### MemcachedService
 
+`src/samples/samples.facade.ts`
+
 ```ts
 import { MemcachedService } from '@andreafspeziale/nestjs-memcached';
 import { SampleReturnType, CachedItemType } from './interfaces'
 
 @Injectable()
-export class SampleFacade {
+export class SamplesFacade {
   constructor(
     private readonly memcachedService: MemcachedService
   ) {}
@@ -175,10 +181,12 @@ So each time you get some cached data it will contain additional properties in o
 
 I usually expose an `/healthz` controller from my microservices in order to check third parties connection.
 
-### HealthController
+#### HealthController
+
+`src/health/health.controller.ts`
 
 ```ts
-import { Controller, Get, VERSION_NEUTRAL } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import {
   HealthCheckService,
   HealthCheckResult,
@@ -189,10 +197,7 @@ import { Transport } from '@nestjs/microservices';
 import { Config, MemcachedConfig } from '../config';
 import { ConfigService } from '@nestjs/config';
 
-@Controller({
-  path: 'healthz',
-  version: VERSION_NEUTRAL,
-})
+@Controller('healthz')
 export class HealthController {
   constructor(
     private readonly health: HealthCheckService,
@@ -220,6 +225,175 @@ export class HealthController {
 }
 ```
 
+### Validation
+
+As mentioned above I usually init my `DynamicModules` injecting the `ConfigService` exposed by the `ConfigModule` (`@nestjs/config` package). This is where I validate my environment variables using a schema validator of my choice, so far I tried `joi`, `class-validator` and `zod`.
+
+This is an example using `joi` but you should tailor it based on your needs, starting by defining a `Config` interface:
+
+`src/config/config.interfaces.ts`
+
+```ts
+import {
+  BaseWrapper,
+  MemcachedModuleOptions,
+} from '@andreafspeziale/nestjs-memcached';
+/**
+ * Cached data shape leveraging metadata feature
+ * {
+ *   content: T;
+ *   ttl: number;
+ *   ttr?: number;
+ *   version: number;
+ *   created: Date;
+ * }
+ */
+export interface CachedMetaConfig {
+  version: number;
+  created: Date;
+}
+
+export type Cached<T = unknown> = BaseWrapper<T> & CachedMetaConfig;
+
+export type MemcachedConfig = MemcachedModuleOptions<unknown, Cached>;
+...
+
+export interface Config {
+  memcached: MemcachedConfig;
+  ...
+}
+```
+
+`src/config/config.schema.ts`
+
+```ts
+import {
+  MEMCACHED_HOST,
+  MEMCACHED_PORT,
+  MEMCACHED_TTL,
+  MEMCACHED_TTR,
+  MEMCACHED_VERSION
+} from '@andreafspeziale/nestjs-memcached';
+import {
+  MEMCACHED_PREFIX
+} from './config.defaults';
+
+const MEMCACHED_SCHEMA = Joi.object({
+  MEMCACHED_HOST: Joi.string().default(MEMCACHED_HOST),
+  MEMCACHED_PORT: Joi.number().default(MEMCACHED_PORT),
+  MEMCACHED_TTL: Joi.number().default(MEMCACHED_TTL),
+  MEMCACHED_TTR: Joi.number().less(Joi.ref('MEMCACHED_TTL')).default(MEMCACHED_TTR),
+  MEMCACHED_PREFIX: Joi.string().default(MEMCACHED_PREFIX),
+  MEMCACHED_VERSION: Joi.number().default(MEMCACHED_VERSION),
+});
+
+const BASE_SCHEMA = ...
+
+export const envSchema = Joi.object()
+  .concat(BASE_SCHEMA)
+  .concat(MEMCACHED_SCHEMA)
+```
+
+`src/config/index.ts`
+
+```ts
+import { Config } from './config.interfaces';
+
+export * from './config.interfaces';
+export * from './config.schema';
+
+export default (): Config => ({
+  memcached: {
+    connections: [
+      {
+        host: process.env.MEMCACHED_HOST,
+        port: parseInt(process.env.MEMCACHED_PORT, 10),
+      },
+    ],
+    ttl: parseInt(process.env.MEMCACHED_TTL, 10),
+    ...(process.env.MEMCACHED_TTR ? { ttr: parseInt(process.env.MEMCACHED_TTR, 10) } : {}),
+    wrapperProcessor: ({ value, ttl, ttr }) => ({
+      content: value,
+      ttl,
+      ...(ttr ? { ttr } : {}),
+      version: parseInt(process.env.MEMCACHED_VERSION, 10),
+      created: new Date(),
+    }),
+    keyProcessor: (key: string) =>
+      `${process.env.MEMCACHED_PREFIX}::V${process.env.MEMCACHED_VERSION}::${key}`,
+  },
+  ...
+});
+```
+
+`src/core/core.module.ts`
+
+```ts
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { MemcachedModule } from '@andreafspeziale/nestjs-memcached';
+import config, { envSchema, Config } from '../config';
+
+@Module({
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [config],
+      validationSchema: envSchema,
+    }),
+    MemcachedModule.forRootAsync({
+      useFactory: (configService: ConfigService<Config>) => configService.get('memcached'),
+      inject: [ConfigService],
+    }),
+    ...
+  ],
+})
+export class CoreModule {}
+```
+
+`src/users/users.facade.ts`
+
+```ts
+import { MemcachedService } from '@andreafspeziale/nestjs-memcached';
+import { Cached } from '../config';
+import { User } from './users.interfaces'
+
+@Injectable()
+export class UsersFacade {
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly memcachedService: MemcachedService
+  ) {}
+
+  async getUser(id: string): Promise<User> {
+    const cachedUser = await this.memcachedService.get<Cached<User>(
+      id, { superjson: true }
+    );
+
+    /**
+     * Cached data shape leveraging metadata feature
+     * {
+     *   content: User;
+     *   ttl: number;
+     *   ttr?: number;
+     *   version: number;
+     *   created: Date;
+     * }
+     */
+
+    if(cachedItem === null) {
+      ...
+      await this.memcachedService.setWithMeta<User, Cached<User>>(
+        id, user, { superjson: true }
+      );
+      ...
+
+      return user;
+    }
+
+    return cachedUser.content;
+}
+```
+
 ## Test
 
 - `docker compose -f docker-compose.test.yml up -d`
@@ -234,9 +408,3 @@ export class HealthController {
 ## License
 
 nestjs-memcached [MIT licensed](LICENSE).
-
-<!-- TODO
-- review readme, maybe add something about health
-- chatgpt for global by config module
-- memcached config
--->
