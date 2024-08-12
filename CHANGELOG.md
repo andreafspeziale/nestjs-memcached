@@ -1,5 +1,25 @@
 
 
+## [3.5.0](https://github.com/andreafspeziale/nestjs-memcached/compare/3.4.5...3.5.0) (2024-08-12)
+
+
+### Features
+
+* add handy defaults ([46460e6](https://github.com/andreafspeziale/nestjs-memcached/commit/46460e6bc54861d8bb0646a38dfc6965db984b85))
+
+
+### Bug Fixes
+
+* package.json and lock ([afeb9c2](https://github.com/andreafspeziale/nestjs-memcached/commit/afeb9c2f191d73a3701583c960dd9e173b61e09e))
+* readme ([c7b200f](https://github.com/andreafspeziale/nestjs-memcached/commit/c7b200f20d0e87b1d9703995f178ad0ed343973a))
+
+
+### Miscellaneous
+
+* npmrc rekt ([b357b4a](https://github.com/andreafspeziale/nestjs-memcached/commit/b357b4a16824f975104b92cdbb9d040287b366bd))
+* rekt more deps ([1f225ae](https://github.com/andreafspeziale/nestjs-memcached/commit/1f225ae5a75383ff72634497ad7d3ca215372a22))
+* update nest monorepo to v10.4.0 ([f01c448](https://github.com/andreafspeziale/nestjs-memcached/commit/f01c448dde2fab2b79bc38d48506db0989e02ed4))
+
 ## [3.4.5](https://github.com/andreafspeziale/nestjs-memcached/compare/3.4.4...3.4.5) (2024-08-10)
 
 
