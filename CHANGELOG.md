@@ -1,5 +1,12 @@
 
 
+## [3.5.1](https://github.com/andreafspeziale/nestjs-memcached/compare/3.5.0...3.5.1) (2024-08-12)
+
+
+### Bug Fixes
+
+* defaults export ([02d8b2f](https://github.com/andreafspeziale/nestjs-memcached/commit/02d8b2f3763a7ac55bd3caca44f9fb159345576a))
+
 ## [3.5.0](https://github.com/andreafspeziale/nestjs-memcached/compare/3.4.5...3.5.0) (2024-08-12)
 
 
