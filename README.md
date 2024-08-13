@@ -236,8 +236,11 @@ This is an example using `joi` but you should tailor it based on your needs, sta
 ```ts
 import {
   BaseWrapper,
-  MemcachedModuleOptions,
+  MemcachedConfig,
 } from '@andreafspeziale/nestjs-memcached';
+
+...
+
 /**
  * Cached data shape leveraging metadata feature
  * {
@@ -255,13 +258,7 @@ export interface CachedMetaConfig {
 
 export type Cached<T = unknown> = BaseWrapper<T> & CachedMetaConfig;
 
-export type MemcachedConfig = MemcachedModuleOptions<unknown, Cached>;
-...
-
-export interface Config {
-  memcached: MemcachedConfig;
-  ...
-}
+export type Config = ... & MemcachedConfig<unknown, Cached>;
 ```
 
 `src/config/config.schema.ts`
@@ -278,6 +275,8 @@ import {
   MEMCACHED_PREFIX
 } from './config.defaults';
 
+const BASE_SCHEMA = ...;
+
 const MEMCACHED_SCHEMA = Joi.object({
   MEMCACHED_HOST: Joi.string().default(MEMCACHED_HOST),
   MEMCACHED_PORT: Joi.number().default(MEMCACHED_PORT),
@@ -287,10 +286,8 @@ const MEMCACHED_SCHEMA = Joi.object({
   MEMCACHED_VERSION: Joi.number().default(MEMCACHED_VERSION),
 });
 
-const BASE_SCHEMA = ...
-
 export const envSchema = Joi.object()
-  .concat(BASE_SCHEMA)
+  .concat(BASE_SCHEMA);
   .concat(MEMCACHED_SCHEMA)
 ```
 
@@ -303,6 +300,7 @@ export * from './config.interfaces';
 export * from './config.schema';
 
 export default (): Config => ({
+  ...,
   memcached: {
     connections: [
       {
@@ -322,7 +320,6 @@ export default (): Config => ({
     keyProcessor: (key: string) =>
       `${process.env.MEMCACHED_PREFIX}::V${process.env.MEMCACHED_VERSION}::${key}`,
   },
-  ...
 });
 ```
 
