@@ -1,5 +1,22 @@
 
 
+## [3.6.0](https://github.com/andreafspeziale/nestjs-memcached/compare/3.5.1...3.6.0) (2024-08-13)
+
+
+### Features
+
+* add MemcachedConfig ([2ac468c](https://github.com/andreafspeziale/nestjs-memcached/commit/2ac468cdf4b1719c4459b8bf160bb451e6f36945))
+
+
+### Bug Fixes
+
+* options provider best practice implementation ([1f0af96](https://github.com/andreafspeziale/nestjs-memcached/commit/1f0af96e0abb8329cb6b9261a3b53d032c2d7420))
+
+
+### Miscellaneous
+
+* update dependency lint-staged to v15.2.9 ([8f49110](https://github.com/andreafspeziale/nestjs-memcached/commit/8f49110a8b57a568c44a2206cf3fd84eaeaf66ae))
+
 ## [3.5.1](https://github.com/andreafspeziale/nestjs-memcached/compare/3.5.0...3.5.1) (2024-08-12)
 
 
