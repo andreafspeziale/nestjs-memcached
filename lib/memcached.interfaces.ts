@@ -38,6 +38,10 @@ export interface MemcachedModuleOptions<T = unknown, R = BaseWrapper<T> & Record
   superjson?: boolean;
 }
 
+export interface MemcachedConfig<T = unknown, R = BaseWrapper<T>> {
+  memcached: MemcachedModuleOptions<T, R>;
+}
+
 export type SetWithMetaOptions<T = unknown, R = BaseWrapper<T>> = Partial<CachingOptions> &
   Processors<T, R> &
   Pick<MemcachedModuleOptions, 'superjson'>;
