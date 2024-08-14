@@ -11,7 +11,7 @@ import {
 } from '../';
 import { TestService } from './test.service';
 
-describe('MemcachedService (e2e)', () => {
+describe('Module, options and service load', () => {
   (
     [
       {
