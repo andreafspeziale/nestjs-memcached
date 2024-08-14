@@ -5,7 +5,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import {
   MemcachedService,
   MemcachedModule,
-  MemcachedModuleOptions,
   getMemcachedModuleOptionsToken,
   getMemcachedClientToken,
   MemcachedConfig,
@@ -17,7 +16,7 @@ describe('Module, options, client and service load', () => {
     [
       {
         description: 'With connection and ttl',
-        options: {
+        memcached: {
           connections: [
             {
               host: 'localhost',
@@ -29,28 +28,28 @@ describe('Module, options, client and service load', () => {
       },
       {
         description: 'With only ttl',
-        options: {
+        memcached: {
           ttl: 60,
         },
       },
       {
         description: 'With ttl and ttr',
-        options: {
+        memcached: {
           ttl: 60,
           ttr: 30,
         },
       },
-    ] as { [key: string]: unknown; options: MemcachedModuleOptions }[]
-  ).forEach(({ description, options }) =>
+    ] as ({ description: string } & MemcachedConfig)[]
+  ).forEach(({ description, memcached }) =>
     describe(`${description}`, () => {
       let module: TestingModule;
       let app: INestApplication;
 
-      const returnConfig = (): MemcachedConfig => ({ memcached: options });
+      const returnConfig = (): MemcachedConfig => ({ memcached });
 
       it('Should create the expected MemcachedModule and MemcachedService instance using forRoot', async () => {
         module = await Test.createTestingModule({
-          imports: [MemcachedModule.forRoot(options)],
+          imports: [MemcachedModule.forRoot(memcached)],
         }).compile();
 
         app = module.createNestApplication();
@@ -64,7 +63,7 @@ describe('Module, options, client and service load', () => {
         expect(memcachedModule).toBeInstanceOf(MemcachedModule);
         expect(memcachedService).toBeInstanceOf(MemcachedService);
 
-        expect(memcachedModuleOptions).toEqual(options);
+        expect(memcachedModuleOptions).toEqual(memcached);
 
         expect(memcachedClient).toBeInstanceOf(MemcachedClient);
 
@@ -79,8 +78,8 @@ describe('Module, options, client and service load', () => {
               load: [returnConfig],
             }),
             MemcachedModule.forRootAsync({
-              useFactory: (configService: ConfigService<ReturnType<typeof returnConfig>>) =>
-                configService.get('memcached') as MemcachedModuleOptions,
+              useFactory: (configService: ConfigService<MemcachedConfig, true>) =>
+                configService.get('memcached'),
               inject: [ConfigService],
             }),
           ],
@@ -97,14 +96,14 @@ describe('Module, options, client and service load', () => {
         expect(memcachedModule).toBeInstanceOf(MemcachedModule);
         expect(memcachedService).toBeInstanceOf(MemcachedService);
 
-        expect(memcachedModuleOptions).toEqual(options);
+        expect(memcachedModuleOptions).toEqual(memcached);
 
         expect(memcachedClient).toBeInstanceOf(MemcachedClient);
       });
 
-      it('Should be possible to access MemcachedModuleOptions and MemcachedClient in another provider using forRoot', async () => {
+      it('Should be possible to access MemcachedModuleOptions and MemcachedClient in another provider using register', async () => {
         module = await Test.createTestingModule({
-          imports: [MemcachedModule.register(options)],
+          imports: [MemcachedModule.register(memcached)],
           providers: [TestService],
         }).compile();
 
@@ -118,7 +117,7 @@ describe('Module, options, client and service load', () => {
         expect(sampleService.getClient()).toBeInstanceOf(MemcachedClient);
       });
 
-      it('Should be possible to access MemcachedModuleOptions and MemcachedClient in another provider using forRootAsync', async () => {
+      it('Should be possible to access MemcachedModuleOptions and MemcachedClient in another provider using registerAsync', async () => {
         module = await Test.createTestingModule({
           imports: [
             ConfigModule.forRoot({
@@ -126,9 +125,8 @@ describe('Module, options, client and service load', () => {
               load: [returnConfig],
             }),
             MemcachedModule.registerAsync({
-              useFactory: (configService: ConfigService<ReturnType<typeof returnConfig>>) => ({
-                ...(configService.get('memcached') as MemcachedModuleOptions),
-              }),
+              useFactory: (configService: ConfigService<MemcachedConfig, true>) =>
+                configService.get('memcached'),
               inject: [ConfigService],
             }),
           ],
