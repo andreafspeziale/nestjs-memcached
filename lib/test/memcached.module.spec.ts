@@ -66,8 +66,6 @@ describe('Module, options, client and service load', () => {
         expect(memcachedModuleOptions).toEqual(memcached);
 
         expect(memcachedClient).toBeInstanceOf(MemcachedClient);
-
-        await app.close();
       });
 
       it('Should create the expected MemcachedModule and MemcachedService instance using forRootAsync', async () => {
