@@ -8,10 +8,11 @@ import {
   MemcachedModuleOptions,
   getMemcachedModuleOptionsToken,
   getMemcachedClientToken,
+  MemcachedConfig,
 } from '../';
 import { TestService } from './test.service';
 
-describe('Module, options and service load', () => {
+describe('Module, options, client and service load', () => {
   (
     [
       {
@@ -45,7 +46,7 @@ describe('Module, options and service load', () => {
       let module: TestingModule;
       let app: INestApplication;
 
-      const returnConfig = (): { memcached: MemcachedModuleOptions } => ({ memcached: options });
+      const returnConfig = (): MemcachedConfig => ({ memcached: options });
 
       it('Should create the expected MemcachedModule and MemcachedService instance using forRoot', async () => {
         module = await Test.createTestingModule({
