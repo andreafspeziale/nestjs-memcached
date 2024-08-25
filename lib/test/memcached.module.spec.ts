@@ -11,7 +11,7 @@ import {
 } from '../';
 import { TestService } from './test.service';
 
-describe('Module, options, client and service load', () => {
+describe('Module, options, client and service load (spec)', () => {
   (
     [
       {
@@ -112,7 +112,9 @@ describe('Module, options, client and service load', () => {
 
         expect(sampleService).toBeInstanceOf(TestService);
 
+        expect(sampleService.getConfig()).toEqual(memcached);
         expect(sampleService.getClient()).toBeInstanceOf(MemcachedClient);
+        expect(sampleService.getService()).toBeInstanceOf(MemcachedService);
       });
 
       it('Should be possible to access MemcachedModuleOptions and MemcachedClient in another provider using registerAsync', async () => {
@@ -139,6 +141,8 @@ describe('Module, options, client and service load', () => {
         expect(sampleService).toBeInstanceOf(TestService);
 
         expect(sampleService.getClient()).toBeInstanceOf(MemcachedClient);
+        expect(sampleService.getClient()).toBeInstanceOf(MemcachedClient);
+        expect(sampleService.getService()).toBeInstanceOf(MemcachedService);
       });
 
       afterEach(async () => {

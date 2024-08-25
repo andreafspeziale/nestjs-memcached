@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import {
   InjectMemcached,
   InjectMemcachedOptions,
   MemcachedModuleOptions,
   MemcachedClient,
+  MemcachedService,
 } from '../';
 
 @Injectable()
@@ -12,6 +13,8 @@ export class TestService {
     @InjectMemcachedOptions()
     private readonly memcachedModuleOptions: MemcachedModuleOptions,
     @InjectMemcached() private readonly memcachedClient: MemcachedClient,
+    @Inject(forwardRef(() => MemcachedService))
+    private readonly memcachedService: MemcachedService,
   ) {}
 
   getConfig(): MemcachedModuleOptions {
@@ -20,5 +23,9 @@ export class TestService {
 
   getClient(): MemcachedClient {
     return this.memcachedClient;
+  }
+
+  getService(): MemcachedService {
+    return this.memcachedService;
   }
 }
