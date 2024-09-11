@@ -45,7 +45,7 @@
     "@nestjs/config": "^3.2.3",
     "@nestjs/platform-express": "^10.4.0",
     "@nestjs/testing": "^10.4.0",
-    "@release-it/conventional-changelog": "8.0.1",
+    "@release-it/conventional-changelog": "8.0.2",
     "@tsconfig/node20": "20.1.4",
     "@tsconfig/recommended": "1.0.7",
     "@tsconfig/strictest": "2.0.5",
