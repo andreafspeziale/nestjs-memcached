@@ -2,8 +2,8 @@ import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import {
   InjectMemcached,
   InjectMemcachedOptions,
-  MemcachedModuleOptions,
   MemcachedClient,
+  MemcachedModuleOptions,
   MemcachedService,
 } from '../';
 

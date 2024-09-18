@@ -1,33 +1,21 @@
-import Memcached from 'memcached';
+import { Pool } from '@joshbetz/memcached';
+import { ConnectionOption, MemcachedClient } from './memcached.interfaces';
 import {
   MEMCACHED_MODULE_OPTIONS_TOKEN,
   MEMCACHED_CLIENT_TOKEN,
-  MEMCACHED_LOGGER_TOKEN,
+  MEMCACHED_OPTIONAL_LOGGER_TOKEN,
 } from './memcached.constants';
-import { MemcachedModuleOptions, WrapperProcessor, MemcachedClient } from './memcached.interfaces';
+import { MEMCACHED_HOST, MEMCACHED_PORT } from './memcached.defaults';
 
 export const getMemcachedModuleOptionsToken = (): string => MEMCACHED_MODULE_OPTIONS_TOKEN;
 export const getMemcachedClientToken = (): string => MEMCACHED_CLIENT_TOKEN;
-export const getMemcachedLoggerToken = (): string => MEMCACHED_LOGGER_TOKEN;
+export const getMemcachedOptionalLoggerToken = (): string => MEMCACHED_OPTIONAL_LOGGER_TOKEN;
 
-export const createMemcachedClient = ({
-  connections = [],
-}: Pick<MemcachedModuleOptions, 'connections'>): MemcachedClient =>
-  Array.isArray(connections)
-    ? new Memcached(
-        connections.map((c) => (c.port ? `${c.host}:${c.port}` : `${c.host}`)).join(','),
-      )
-    : new Memcached(
-        connections.locations
-          ? connections.locations
-              .map((c) => (c.port ? `${c.host}:${c.port}` : `${c.host}`))
-              .join(',')
-          : [],
-        connections.options,
-      );
-
-export const defaultWrapperProcessor: WrapperProcessor = ({ value, ttl, ttr }) => ({
-  content: value,
-  ttl,
-  ...(ttr ? { ttr } : {}),
-});
+export const createMemcachedClient = (
+  connection: ConnectionOption['connection'],
+): MemcachedClient =>
+  new Pool(
+    connection?.port || MEMCACHED_PORT,
+    connection?.host || MEMCACHED_HOST,
+    connection?.options,
+  );
