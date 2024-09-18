@@ -1,82 +1,193 @@
+import { Pool } from '@joshbetz/memcached';
+import { PoolOptions } from '@joshbetz/memcached/build/pool';
 import { ModuleMetadata, Provider, Type } from '@nestjs/common';
-import type Memcached from 'memcached';
-import { stringify, parse } from 'superjson';
 
-export interface MemcachedClient extends Memcached {}
+/**
+ * Memcache client alias
+ */
 
-export interface MemcachedOptions extends Memcached.options {}
+export type MemcachedClient = Pool;
 
-export interface CachingOptions {
+/**
+ * The following is what we can actually
+ */
+
+type CachablePrimitiveJSONValue = string | number | boolean;
+
+interface CachableJSONArray extends Array<CachableJSONValue> {}
+
+interface CachableJSONObject {
+  [key: string]: CachableJSONValue;
+}
+
+type CachableJSONValue = CachablePrimitiveJSONValue | CachableJSONArray | CachableJSONObject;
+
+interface CachableArray extends Array<CachableValue> {}
+
+interface CachableObject {
+  [key: string]: CachableValue;
+}
+
+type CachableSerializableJSONValue =
+  | symbol
+  | Set<CachableValue>
+  | Map<CachableValue, CachableValue>
+  | undefined
+  | bigint
+  | Date
+  | RegExp;
+
+export type CachableValue =
+  | CachableJSONValue
+  | CachableSerializableJSONValue
+  | CachableArray
+  | CachableObject;
+
+/**
+ * Options
+ */
+
+export type ConnectionOptions = Omit<PoolOptions, 'prefix'>;
+
+export interface ConnectionOption {
+  connection?: {
+    host?: string;
+    port?: number;
+    options?: ConnectionOptions;
+  };
+}
+
+export interface Lifetimes {
   ttl: number;
   ttr?: number;
 }
 
-export interface WrappedValue<T> {
-  content: T;
+export interface LifetimesOption {
+  lifetimes: Lifetimes;
 }
 
-export interface MemcachedConnections {
-  host: string;
-  port?: number;
+export interface OptionalLifetimesOption {
+  lifetimes?: Lifetimes;
 }
 
-export type BaseWrapper<T = unknown> = WrappedValue<T> & CachingOptions;
-
-export type WrapperProcessor<T = unknown, R = BaseWrapper<T>> = (
-  p: { value: T } & CachingOptions,
-) => R;
-
-export type KeyProcessor = (key: string) => string;
-
-export interface Processors<T = unknown, R = BaseWrapper<T>> {
-  wrapperProcessor?: WrapperProcessor<T, R>;
-  keyProcessor?: KeyProcessor;
+export interface OptionalVersionOption {
+  version?: string;
 }
 
-export interface MemcachedModuleOptions<T = unknown, R = BaseWrapper<T> & Record<string, unknown>>
-  extends CachingOptions,
-    Processors<T, R> {
-  connections?:
-    | MemcachedConnections[]
-    | { locations?: MemcachedConnections[]; options?: MemcachedOptions };
-  superjson?: boolean;
+export interface OptionalPrefixOption {
+  prefix?: string;
+}
+
+export interface OptionalLogOption {
   log?: boolean;
 }
 
-export interface MemcachedConfig<T = unknown, R = BaseWrapper<T> & Record<string, unknown>> {
-  memcached: MemcachedModuleOptions<T, R>;
+/**
+ * KeyProcessor options
+ */
+
+export interface KeyProcessorInput extends Lifetimes, OptionalVersionOption, OptionalPrefixOption {
+  key: string;
 }
 
-export type SetWithMetaOptions<T = unknown, R = BaseWrapper<T>> = Partial<CachingOptions> &
-  Processors<T, R> &
-  Pick<MemcachedModuleOptions, 'superjson'>;
+export type KeyProcessor = (i: KeyProcessorInput) => string;
 
-export type SetOptions = Partial<Pick<CachingOptions, 'ttl'>> &
-  Pick<Processors, 'keyProcessor'> &
-  Pick<MemcachedModuleOptions, 'superjson'>;
+export type OptionalKeyProcessorOption = {
+  keyProcessor?: { disable?: boolean; fn?: KeyProcessor };
+};
 
-export type AddOptions = SetOptions;
+/**
+ * GetProcessor options
+ */
 
-export type GetOptions = Pick<Processors, 'keyProcessor'> &
-  Pick<MemcachedModuleOptions, 'superjson'>;
+export type DisableGetProcessor = {
+  getProcessor?: { disable?: boolean };
+};
 
-export type IncrDecrOptions = Pick<Processors, 'keyProcessor'>;
+export type GetProcessor<
+  Cached extends CachableValue = CachableValue,
+  ValueGetProcessorInput extends CachableValue = Cached,
+> = (i: ValueGetProcessorInput) => Cached;
 
-export type DelOptions = Pick<Processors, 'keyProcessor'>;
+export type OptionalGetProcessorOption<
+  Cached extends CachableValue = CachableValue,
+  ValueGetProcessorInput extends CachableValue = Cached,
+> = {
+  getProcessor?: {
+    disable?: boolean;
+    fn?: GetProcessor<Cached, ValueGetProcessorInput>;
+  };
+};
 
-export interface Parser {
-  stringify: typeof stringify;
-  parse: typeof parse;
+/**
+ * SetProcessor options
+ */
+
+export type DisableSetProcessor = {
+  setProcessor?: { disable?: boolean };
+};
+
+export interface SetProcessorInput<ToBeCached extends CachableValue = CachableValue>
+  extends Lifetimes,
+    OptionalVersionOption,
+    OptionalPrefixOption {
+  value: ToBeCached;
 }
 
-export interface MemcachedModuleOptionsFactory {
-  createMemcachedModuleOptions(): Promise<MemcachedModuleOptions> | MemcachedModuleOptions;
+export type SetProcessor<
+  ToBeCached extends CachableValue = CachableValue,
+  ValueSetProcessorOutput extends CachableValue = ToBeCached,
+> = (i: SetProcessorInput<ToBeCached>) => ValueSetProcessorOutput;
+
+export type OptionalSetProcessorOption<
+  ToBeCached extends CachableValue = CachableValue,
+  ValueSetProcessorOutput extends CachableValue = ToBeCached,
+> = {
+  setProcessor?: {
+    disable?: boolean;
+    fn?: SetProcessor<ToBeCached, ValueSetProcessorOutput>;
+  };
+};
+
+/**
+ * Module options
+ */
+
+export interface MemcachedModuleOptions<
+  ValueProcessorInputAndOutput extends CachableValue = CachableValue,
+> extends ConnectionOption,
+    LifetimesOption,
+    OptionalVersionOption,
+    OptionalPrefixOption,
+    OptionalLogOption,
+    OptionalKeyProcessorOption,
+    OptionalGetProcessorOption<CachableValue, ValueProcessorInputAndOutput>,
+    OptionalSetProcessorOption<CachableValue, ValueProcessorInputAndOutput> {}
+
+export interface MemcachedConfig<
+  ValueProcessorInputAndOutput extends CachableValue = CachableValue,
+> {
+  memcached: MemcachedModuleOptions<ValueProcessorInputAndOutput>;
 }
 
-export interface MemcachedModuleAsyncOptions extends Pick<ModuleMetadata, 'imports'> {
+export interface MemcachedModuleOptionsFactory<
+  ValueProcessorInputAndOutput extends CachableValue = CachableValue,
+> {
+  createMemcachedModuleOptions():
+    | Promise<MemcachedModuleOptions<ValueProcessorInputAndOutput>>
+    | MemcachedModuleOptions<ValueProcessorInputAndOutput>;
+}
+
+export interface MemcachedModuleAsyncOptions<
+  ValueProcessorInputAndOutput extends CachableValue = CachableValue,
+> extends Pick<ModuleMetadata, 'imports'> {
   inject?: any[];
-  useClass?: Type<MemcachedModuleOptionsFactory>;
-  useExisting?: Type<MemcachedModuleOptionsFactory>;
-  useFactory?: (...args: any[]) => Promise<MemcachedModuleOptions> | MemcachedModuleOptions;
+  useClass?: Type<MemcachedModuleOptionsFactory<ValueProcessorInputAndOutput>>;
+  useExisting?: Type<MemcachedModuleOptionsFactory<ValueProcessorInputAndOutput>>;
+  useFactory?: (
+    ...args: any[]
+  ) =>
+    | Promise<MemcachedModuleOptions<ValueProcessorInputAndOutput>>
+    | MemcachedModuleOptions<ValueProcessorInputAndOutput>;
   extraProviders?: Provider[];
 }
