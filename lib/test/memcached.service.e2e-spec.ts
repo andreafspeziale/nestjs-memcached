@@ -1,5 +1,4 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
 import { LoggerLevel, LoggerModule, LoggerService } from '@andreafspeziale/nestjs-log';
 import {
   MemcachedService,
@@ -9,6 +8,7 @@ import {
   MemcachedModuleOptions,
   getMemcachedLoggerToken,
 } from '../';
+import { LOGGER_INVOCATION_BY_API_COUNT_MAP } from './test.constants';
 
 describe('MemcachedService (e2e)', () => {
   (
@@ -43,17 +43,7 @@ describe('MemcachedService (e2e)', () => {
     ] as { [key: string]: unknown; options: MemcachedModuleOptions }[]
   ).forEach(({ options }) =>
     describe(`Module with options: ${JSON.stringify(options)}`, () => {
-      const logCallsByAPI = {
-        setWithMeta: 4,
-        set: 3,
-        get: 3,
-        add: 3,
-        incr: 2,
-        decr: 2,
-        del: 2,
-      };
-
-      let app: INestApplication;
+      let moduleRef: TestingModule;
 
       let logger: LoggerService;
       let loggerDebugMethodSpy: jest.SpyInstance<
@@ -64,7 +54,7 @@ describe('MemcachedService (e2e)', () => {
       let memcachedService: MemcachedService;
 
       beforeAll(async () => {
-        const moduleRef: TestingModule = await Test.createTestingModule({
+        moduleRef = await Test.createTestingModule({
           imports: [
             LoggerModule.forRoot({ level: LoggerLevel.Silent }),
             MemcachedModule.forRoot(options, [
@@ -73,17 +63,13 @@ describe('MemcachedService (e2e)', () => {
           ],
         }).compile();
 
-        app = moduleRef.createNestApplication();
-
-        logger = await app.resolve(getMemcachedLoggerToken());
+        logger = await moduleRef.resolve(getMemcachedLoggerToken());
 
         // * Spy intercepts the method calls at the code level,
         // * before Winston's internal logic decides whether to actually log or not.
         loggerDebugMethodSpy = jest.spyOn(logger, 'debug');
 
-        memcachedService = app.get(MemcachedService);
-
-        await app.init();
+        memcachedService = moduleRef.get(MemcachedService);
       });
 
       describe('setWithMeta & get', () => {
@@ -109,7 +95,8 @@ describe('MemcachedService (e2e)', () => {
 
           options.log
             ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
-                logCallsByAPI['setWithMeta'] + logCallsByAPI['get'],
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['setWithMeta'] +
+                  LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
               )
             : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
@@ -140,7 +127,8 @@ describe('MemcachedService (e2e)', () => {
 
           options.log
             ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
-                logCallsByAPI['setWithMeta'] + logCallsByAPI['get'],
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['setWithMeta'] +
+                  LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
               )
             : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
@@ -167,7 +155,8 @@ describe('MemcachedService (e2e)', () => {
 
           options.log
             ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
-                logCallsByAPI['setWithMeta'] + logCallsByAPI['get'],
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['setWithMeta'] +
+                  LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
               )
             : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
@@ -197,7 +186,8 @@ describe('MemcachedService (e2e)', () => {
 
           options.log
             ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
-                logCallsByAPI['setWithMeta'] + logCallsByAPI['get'],
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['setWithMeta'] +
+                  LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
               )
             : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
@@ -232,7 +222,8 @@ describe('MemcachedService (e2e)', () => {
 
           options.log
             ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
-                logCallsByAPI['setWithMeta'] + logCallsByAPI['get'],
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['setWithMeta'] +
+                  LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
               )
             : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
@@ -276,7 +267,8 @@ describe('MemcachedService (e2e)', () => {
 
           options.log
             ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
-                logCallsByAPI['setWithMeta'] + logCallsByAPI['get'],
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['setWithMeta'] +
+                  LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
               )
             : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
@@ -294,7 +286,8 @@ describe('MemcachedService (e2e)', () => {
 
           options.log
             ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
-                logCallsByAPI['set'] + logCallsByAPI['get'],
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] +
+                  LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
               )
             : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
@@ -314,7 +307,8 @@ describe('MemcachedService (e2e)', () => {
 
           options.log
             ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
-                logCallsByAPI['set'] + logCallsByAPI['get'],
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] +
+                  LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
               )
             : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
@@ -329,7 +323,8 @@ describe('MemcachedService (e2e)', () => {
 
           options.log
             ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
-                logCallsByAPI['set'] + logCallsByAPI['get'],
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] +
+                  LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
               )
             : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
@@ -375,7 +370,8 @@ describe('MemcachedService (e2e)', () => {
 
           options.log
             ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
-                logCallsByAPI['set'] + logCallsByAPI['get'],
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] +
+                  LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
               )
             : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
@@ -386,7 +382,9 @@ describe('MemcachedService (e2e)', () => {
           expect(cached).toBe(null);
 
           options.log
-            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(logCallsByAPI['get'])
+            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
+              )
             : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
       });
@@ -403,7 +401,8 @@ describe('MemcachedService (e2e)', () => {
 
           options.log
             ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
-                logCallsByAPI['add'] + logCallsByAPI['get'],
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['add'] +
+                  LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
               )
             : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
@@ -423,7 +422,8 @@ describe('MemcachedService (e2e)', () => {
 
           options.log
             ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
-                logCallsByAPI['add'] + logCallsByAPI['get'],
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['add'] +
+                  LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
               )
             : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
@@ -438,7 +438,8 @@ describe('MemcachedService (e2e)', () => {
 
           options.log
             ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
-                logCallsByAPI['add'] + logCallsByAPI['get'],
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['add'] +
+                  LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
               )
             : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
@@ -451,7 +452,8 @@ describe('MemcachedService (e2e)', () => {
 
           options.log
             ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
-                logCallsByAPI['add'] + logCallsByAPI['get'],
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['add'] +
+                  LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
               )
             : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
@@ -486,7 +488,8 @@ describe('MemcachedService (e2e)', () => {
 
           options.log
             ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
-                logCallsByAPI['add'] + logCallsByAPI['get'],
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['add'] +
+                  LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
               )
             : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
@@ -502,7 +505,8 @@ describe('MemcachedService (e2e)', () => {
 
           options.log
             ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
-                logCallsByAPI['add'] + logCallsByAPI['add'],
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['add'] +
+                  LOGGER_INVOCATION_BY_API_COUNT_MAP['add'],
               )
             : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
@@ -521,7 +525,8 @@ describe('MemcachedService (e2e)', () => {
 
           options.log
             ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
-                logCallsByAPI['set'] + logCallsByAPI['incr'],
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] +
+                  LOGGER_INVOCATION_BY_API_COUNT_MAP['incr'],
               )
             : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
@@ -542,7 +547,8 @@ describe('MemcachedService (e2e)', () => {
 
           options.log
             ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
-                logCallsByAPI['set'] + logCallsByAPI['incr'],
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] +
+                  LOGGER_INVOCATION_BY_API_COUNT_MAP['incr'],
               )
             : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
@@ -553,7 +559,9 @@ describe('MemcachedService (e2e)', () => {
           expect(result).toBe(false);
 
           options.log
-            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(logCallsByAPI['incr'])
+            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['incr'],
+              )
             : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
 
@@ -568,7 +576,8 @@ describe('MemcachedService (e2e)', () => {
 
           options.log
             ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
-                logCallsByAPI['set'] + logCallsByAPI['incr'],
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] +
+                  LOGGER_INVOCATION_BY_API_COUNT_MAP['incr'],
               )
             : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
@@ -588,7 +597,9 @@ describe('MemcachedService (e2e)', () => {
 
           options.log
             ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
-                logCallsByAPI['set'] + logCallsByAPI['incr'] + logCallsByAPI['get'],
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] +
+                  LOGGER_INVOCATION_BY_API_COUNT_MAP['incr'] +
+                  LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
               )
             : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
@@ -607,7 +618,8 @@ describe('MemcachedService (e2e)', () => {
 
           options.log
             ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
-                logCallsByAPI['set'] + logCallsByAPI['decr'],
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] +
+                  LOGGER_INVOCATION_BY_API_COUNT_MAP['decr'],
               )
             : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
@@ -624,7 +636,8 @@ describe('MemcachedService (e2e)', () => {
 
           options.log
             ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
-                logCallsByAPI['set'] + logCallsByAPI['decr'],
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] +
+                  LOGGER_INVOCATION_BY_API_COUNT_MAP['decr'],
               )
             : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
@@ -645,7 +658,8 @@ describe('MemcachedService (e2e)', () => {
 
           options.log
             ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
-                logCallsByAPI['set'] + logCallsByAPI['decr'],
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] +
+                  LOGGER_INVOCATION_BY_API_COUNT_MAP['decr'],
               )
             : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
@@ -662,7 +676,8 @@ describe('MemcachedService (e2e)', () => {
 
           options.log
             ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
-                logCallsByAPI['set'] + logCallsByAPI['decr'],
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] +
+                  LOGGER_INVOCATION_BY_API_COUNT_MAP['decr'],
               )
             : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
@@ -673,7 +688,9 @@ describe('MemcachedService (e2e)', () => {
           expect(result).toBe(false);
 
           options.log
-            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(logCallsByAPI['decr'])
+            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['decr'],
+              )
             : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
 
@@ -688,7 +705,8 @@ describe('MemcachedService (e2e)', () => {
 
           options.log
             ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
-                logCallsByAPI['set'] + logCallsByAPI['decr'],
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] +
+                  LOGGER_INVOCATION_BY_API_COUNT_MAP['decr'],
               )
             : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
@@ -708,7 +726,9 @@ describe('MemcachedService (e2e)', () => {
 
           options.log
             ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
-                logCallsByAPI['set'] + logCallsByAPI['decr'] + logCallsByAPI['get'],
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] +
+                  LOGGER_INVOCATION_BY_API_COUNT_MAP['decr'] +
+                  LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
               )
             : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
@@ -724,7 +744,8 @@ describe('MemcachedService (e2e)', () => {
 
           options.log
             ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
-                logCallsByAPI['set'] + logCallsByAPI['del'],
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] +
+                  LOGGER_INVOCATION_BY_API_COUNT_MAP['del'],
               )
             : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
@@ -735,7 +756,9 @@ describe('MemcachedService (e2e)', () => {
           expect(deleted).toBe(false);
 
           options.log
-            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(logCallsByAPI['del'])
+            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['del'],
+              )
             : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
       });
@@ -748,7 +771,7 @@ describe('MemcachedService (e2e)', () => {
 
       afterAll(async () => {
         memcachedService.end();
-        await app.close();
+        await moduleRef.close();
       });
     }),
   );

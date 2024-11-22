@@ -45,7 +45,6 @@
     "@commitlint/config-conventional": "^19.2.2",
     "@nestjs/common": "^10.4.0",
     "@nestjs/config": "^3.2.3",
-    "@nestjs/platform-express": "^10.4.0",
     "@nestjs/testing": "^10.4.0",
     "@release-it/conventional-changelog": "8.0.2",
     "@tsconfig/node20": "20.1.4",
