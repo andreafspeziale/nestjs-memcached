@@ -1,8 +1,0 @@
-version: '3.9'
-
-services:
-  cache:
-    container_name: memcached-0
-    image: bitnami/memcached:1.6.29
-    ports:
-      - 11211:11211

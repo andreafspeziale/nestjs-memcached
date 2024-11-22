@@ -115,6 +115,7 @@ export class CoreModule {}
 ```
 
 ### Decorators
+
 > use the client and create your own service
 
 #### InjectMemcachedOptions() and InjectMemcached()
@@ -144,6 +145,7 @@ export class SamplesService {
 ```
 
 ### Service
+
 > out of the box service with a set of features
 
 #### MemcachedService
@@ -219,12 +221,8 @@ export class HealthController {
         this.microservice.pingCheck('memcached', {
           transport: Transport.TCP,
           options: {
-            host: this.cs.get<Config['memcached']>(
-              'memcached',
-            ).connections?.[0].host,
-            port: this.cs.get<Config['memcached']>(
-              'memcached',
-            ).connections?.[0].port,
+            host: this.cs.get<Config['memcached']>('memcached').connections?.[0].host,
+            port: this.cs.get<Config['memcached']>('memcached').connections?.[0].port,
           },
         }),
     ]);
@@ -400,7 +398,7 @@ export class UsersFacade {
 
 ## Test
 
-- `docker compose -f docker-compose.test.yml up -d`
+- `docker compose -f compose-test.yaml up -d`
 - `pnpm test`
 
 ## Stay in touch

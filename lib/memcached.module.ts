@@ -14,7 +14,10 @@ import {
 
 @Global()
 export class MemcachedModule {
-  public static forRoot(options: MemcachedModuleOptions): DynamicModule {
+  public static forRoot(
+    options: MemcachedModuleOptions,
+    extraProviders?: Provider[],
+  ): DynamicModule {
     const optionsProvider: Provider = {
       provide: getMemcachedModuleOptionsToken(),
       useValue: options,
@@ -27,13 +30,13 @@ export class MemcachedModule {
 
     return {
       module: MemcachedModule,
-      providers: [optionsProvider, clientProvider, MemcachedService],
+      providers: [...(extraProviders || []), optionsProvider, clientProvider, MemcachedService],
       exports: [optionsProvider, clientProvider, MemcachedService],
     };
   }
 
-  static register(options: MemcachedModuleOptions): DynamicModule {
-    return MemcachedModule.forRoot(options);
+  static register(options: MemcachedModuleOptions, extraProviders?: Provider[]): DynamicModule {
+    return MemcachedModule.forRoot(options, extraProviders);
   }
 
   public static forRootAsync(options: MemcachedModuleAsyncOptions): DynamicModule {
@@ -46,7 +49,12 @@ export class MemcachedModule {
 
     return {
       module: MemcachedModule,
-      providers: [...this.createAsyncProviders(options), memcachedClientProvider, MemcachedService],
+      providers: [
+        ...this.createAsyncProviders(options),
+        ...(options.extraProviders || []),
+        memcachedClientProvider,
+        MemcachedService,
+      ],
       exports: [...this.createAsyncProviders(options), memcachedClientProvider, MemcachedService],
     };
   }
