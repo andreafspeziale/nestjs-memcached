@@ -1,5 +1,4 @@
 import MemcachedClient from 'memcached';
-import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import {
@@ -43,7 +42,6 @@ describe('Module, options, client and service load (spec)', () => {
   ).forEach(({ description, memcached }) =>
     describe(`${description}`, () => {
       let module: TestingModule;
-      let app: INestApplication;
 
       const returnConfig = (): MemcachedConfig => ({ memcached });
 
@@ -52,12 +50,9 @@ describe('Module, options, client and service load (spec)', () => {
           imports: [MemcachedModule.forRoot(memcached)],
         }).compile();
 
-        app = module.createNestApplication();
-        await app.init();
-
-        const memcachedModule = app.get(MemcachedModule);
-        const memcachedService = app.get(MemcachedService);
-        const memcachedModuleOptions = app.get(getMemcachedModuleOptionsToken());
+        const memcachedModule = module.get(MemcachedModule);
+        const memcachedService = module.get(MemcachedService);
+        const memcachedModuleOptions = module.get(getMemcachedModuleOptionsToken());
         const memcachedClient = module.get(getMemcachedClientToken());
 
         expect(memcachedModule).toBeInstanceOf(MemcachedModule);
@@ -83,9 +78,6 @@ describe('Module, options, client and service load (spec)', () => {
           ],
         }).compile();
 
-        app = module.createNestApplication();
-        await app.init();
-
         const memcachedModule = module.get(MemcachedModule);
         const memcachedService = module.get(MemcachedService);
         const memcachedModuleOptions = module.get(getMemcachedModuleOptionsToken());
@@ -104,9 +96,6 @@ describe('Module, options, client and service load (spec)', () => {
           imports: [MemcachedModule.register(memcached)],
           providers: [TestService],
         }).compile();
-
-        app = module.createNestApplication();
-        await app.init();
 
         const sampleService = module.get(TestService);
 
@@ -133,9 +122,6 @@ describe('Module, options, client and service load (spec)', () => {
           providers: [TestService],
         }).compile();
 
-        app = module.createNestApplication();
-        await app.init();
-
         const sampleService = module.get(TestService);
 
         expect(sampleService).toBeInstanceOf(TestService);
@@ -146,7 +132,7 @@ describe('Module, options, client and service load (spec)', () => {
       });
 
       afterEach(async () => {
-        await app.close();
+        await module.close();
       });
     }),
   );
