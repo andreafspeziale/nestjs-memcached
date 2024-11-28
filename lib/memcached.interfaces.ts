@@ -34,7 +34,9 @@ export interface Processors<T = unknown, R = BaseWrapper<T>> {
 export interface MemcachedModuleOptions<T = unknown, R = BaseWrapper<T> & Record<string, unknown>>
   extends CachingOptions,
     Processors<T, R> {
-  connections?: MemcachedConnections[];
+  connections?:
+    | MemcachedConnections[]
+    | { locations?: MemcachedConnections[]; options?: Memcached.options };
   superjson?: boolean;
   log?: boolean;
 }
