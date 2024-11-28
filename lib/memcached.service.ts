@@ -1,5 +1,5 @@
 import b from 'bluebird';
-import { Injectable, Optional } from '@nestjs/common';
+import { Injectable, OnModuleDestroy, Optional } from '@nestjs/common';
 import { LoggerService } from '@andreafspeziale/nestjs-log';
 import { stringify, parse } from 'superjson';
 import {
@@ -25,7 +25,7 @@ import {
 import { defaultWrapperProcessor } from './memcached.utils';
 
 @Injectable()
-export class MemcachedService {
+export class MemcachedService implements OnModuleDestroy {
   private readonly client: ReturnType<typeof b.promisifyAll<MemcachedClient>>;
   private readonly wrapperProcessor: WrapperProcessor;
   private readonly keyProcessor: KeyProcessor | undefined;
@@ -359,6 +359,15 @@ export class MemcachedService {
         fn: this.end.name,
       });
 
-    return this.client.end();
+    this.client.end();
+  }
+
+  onModuleDestroy(): void {
+    this.memcachedModuleOptions.log &&
+      this.logger?.debug('Closing connection...', {
+        fn: this.onModuleDestroy.name,
+      });
+
+    this.client.end();
   }
 }

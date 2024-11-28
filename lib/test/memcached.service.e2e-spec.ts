@@ -10,9 +10,15 @@ import {
 } from '../';
 import { LOGGER_INVOCATION_BY_API_COUNT_MAP } from './test.constants';
 
+// Some random configs options
 describe('MemcachedService (e2e)', () => {
   (
     [
+      {
+        options: {
+          ttl: 60,
+        },
+      },
       {
         options: {
           connections: [
@@ -21,6 +27,33 @@ describe('MemcachedService (e2e)', () => {
               port: 11211,
             },
           ],
+          ttl: 60,
+        },
+      },
+      {
+        options: {
+          connections: {
+            options: {
+              poolSize: 1,
+            },
+          },
+          ttl: 60,
+          superjson: false,
+        },
+      },
+      {
+        options: {
+          connections: {
+            locations: [
+              {
+                host: 'localhost',
+                port: 11211,
+              },
+            ],
+            options: {
+              poolSize: 1,
+            },
+          },
           ttl: 60,
           superjson: true,
         },
@@ -770,7 +803,6 @@ describe('MemcachedService (e2e)', () => {
       });
 
       afterAll(async () => {
-        memcachedService.end();
         await moduleRef.close();
       });
     }),
