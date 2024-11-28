@@ -74,20 +74,22 @@ import { MemcachedModule } from '@andreafspeziale/nestjs-memcached';
         ...(ttr ? { ttr } : {}),
         createdAt: new Date(),
       }),
+      log: true,
     }),
   ],
-  ...
+  ....
 })
 export class CoreModule {}
 ```
 
-- For signle connection you can omit the `connections` property.
-- For multiple connections you can omit the `port` property if the server is using the default one.
-- `ttl` is the global time to live.
-- `ttr` is the global optional time to refresh.
-- Typically when caching a JS object like `Date` you will get back a `string` from the cache, [superjson](https://github.com/blitz-js/superjson) will `stringify` on cache `sets` adding metadata in order to later `parse` on cache `gets` and retrieve the initial "raw" data.
-- `wrapperProcessor` is the global optional wrapper processor function which wraps the value to be cached and adds metadata.
-- `keyProcessor` is the global optional key processor function which process your cache keys.
+- For signle connection you can omit the `connections` property
+- For multiple connections you can omit the `port` property if the server is using the default one
+- `ttl` is the global time to live
+- `ttr` is the global optional time to refresh
+- Typically when caching a JS object like `Date` you will get back a `string` from the cache, [superjson](https://github.com/blitz-js/superjson) will `stringify` on cache `sets` adding metadata in order to later `parse` on cache `gets` and retrieve the initial "raw" data
+- `keyProcessor` is the global optional key processor function which process your cache keys
+- `wrapperProcessor` is the global optional wrapper processor function which wraps the value to be cached and adds metadata
+- `log` enable or disable logging (`LoggerService` must be provided, check Extra Providers section)
 
 #### MemcachedModule.forRootAsync(options)
 
@@ -102,19 +104,20 @@ import { Config } from './config';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      ...
+      ....
     }),
     MemcachedModule.forRootAsync({
-      useFactory: (configService: ConfigService<Config, true>) => configService.get('memcached'),
+      useFactory: (cs: ConfigService<Config, true>) => cs.get<ConfigService['memcached']>('memcached'),
       inject: [ConfigService],
     }),
   ],
-  ...
+  ....
 })
 export class CoreModule {}
 ```
 
 ### Decorators
+
 > use the client and create your own service
 
 #### InjectMemcachedOptions() and InjectMemcached()
@@ -123,7 +126,13 @@ export class CoreModule {}
 
 ```ts
 import { Injectable } from '@nestjs/common';
-import { InjectMemcachedOptions, InjectMemcached, MemcachedClient } from '@andreafspeziale/nestjs-memcached';
+import {
+  InjectMemcachedOptions,
+  InjectMemcached,
+  MemcachedClient,
+  MemcachedModuleOptions,
+  MemcachedClient
+} from '@andreafspeziale/nestjs-memcached';
 
 @Injectable()
 export class SamplesService {
@@ -133,11 +142,12 @@ export class SamplesService {
     @InjectMemcached() private readonly memcachedClient: MemcachedClient
   ) {}
 
-  ...
+  ....
 }
 ```
 
 ### Service
+
 > out of the box service with a set of features
 
 #### MemcachedService
@@ -146,22 +156,23 @@ export class SamplesService {
 
 ```ts
 import { MemcachedService } from '@andreafspeziale/nestjs-memcached';
-import { SampleReturnType, CachedItemType } from './interfaces'
+import { SampleReturnType } from './samples.interfaces'
 
 @Injectable()
 export class SamplesFacade {
   constructor(
-    private readonly memcachedService: MemcachedService
+    private readonly memcachedService: MemcachedService,
   ) {}
 
-  async sampleMethod(): Promise<SampleReturn> {
-    const cachedItem = await this.memcachedService.get<CachedPlainOrWrappedItem>(cachedItemKey);
+  async sampleMethod(): Promise<SampleReturnType> {
+    const cachedItem = await this.memcachedService.get<string>('key');
 
     if(cachedItem === null) {
-      ...
+      ....
       await this.memcachedService.set<string>('key', 'value');
-      ...
+      ....
     }
+  }
 }
 ```
 
@@ -171,7 +182,7 @@ You can also set all the proper `Processors` and `CachingOptions` inline in orde
 await this.memcachedService.set<string>('key', 'value', { ttl: 100 });
 ```
 
-The provided `MemcachedService` is an opinionated wrapper around [memcached](https://github.com/3rd-Eden/memcached#readme) trying to be unopinionated as much as possibile at the same time.
+The exported `MemcachedService` is an opinionated wrapper around [memcached](https://github.com/3rd-Eden/memcached#readme) trying to be unopinionated as much as possibile at the same time.
 
 `setWithMeta` enables `refresh-ahead` cache pattern in order to let you add a logical expiration called `ttr (time to refresh)` to the cached data and more.
 
@@ -194,7 +205,7 @@ import {
   MicroserviceHealthIndicator,
 } from '@nestjs/terminus';
 import { Transport } from '@nestjs/microservices';
-import { Config, MemcachedConfig } from '../config';
+import { Config } from '../config';
 import { ConfigService } from '@nestjs/config';
 
 @Controller('healthz')
@@ -202,7 +213,7 @@ export class HealthController {
   constructor(
     private readonly health: HealthCheckService,
     private readonly microservice: MicroserviceHealthIndicator,
-    private readonly configService: ConfigService<Config, true>,
+    private readonly cs: ConfigService<Config, true>,
   ) {}
 
   @Get()
@@ -212,12 +223,8 @@ export class HealthController {
         this.microservice.pingCheck('memcached', {
           transport: Transport.TCP,
           options: {
-            host: this.configService.get<MemcachedConfig['memcached']>(
-              'memcached',
-            ).connections?.[0].host,
-            port: this.configService.get<MemcachedConfig['memcached']>(
-              'memcached',
-            ).connections?.[0].port,
+            host: this.cs.get<Config['memcached']>('memcached').connections?.[0].host,
+            port: this.cs.get<Config['memcached']>('memcached').connections?.[0].port,
           },
         }),
     ]);
@@ -239,7 +246,7 @@ import {
   MemcachedConfig,
 } from '@andreafspeziale/nestjs-memcached';
 
-...
+
 
 /**
  * Cached data shape leveraging metadata feature
@@ -258,7 +265,7 @@ export interface CachedMetaConfig {
 
 export type Cached<T = unknown> = BaseWrapper<T> & CachedMetaConfig;
 
-export type Config = ... & MemcachedConfig<unknown, Cached>;
+export type Config = .... & MemcachedConfig<unknown, Cached>;
 ```
 
 `src/config/config.schema.ts`
@@ -275,7 +282,7 @@ import {
   MEMCACHED_PREFIX
 } from './config.defaults';
 
-const BASE_SCHEMA = ...;
+const BASE_SCHEMA = ....;
 
 const MEMCACHED_SCHEMA = Joi.object({
   MEMCACHED_HOST: Joi.string().default(MEMCACHED_HOST),
@@ -300,7 +307,7 @@ export * from './config.interfaces';
 export * from './config.schema';
 
 export default (): Config => ({
-  ...,
+  ....,
   memcached: {
     connections: [
       {
@@ -338,10 +345,10 @@ import config, { envSchema, Config } from '../config';
       validationSchema: envSchema,
     }),
     MemcachedModule.forRootAsync({
-      useFactory: (configService: ConfigService<Config>) => configService.get('memcached'),
+      useFactory: (cs: ConfigService<Config, true>) => cs.get<Config['memcached']>('memcached'),
       inject: [ConfigService],
     }),
-    ...
+    ....
   ],
 })
 export class CoreModule {}
@@ -378,11 +385,11 @@ export class UsersFacade {
      */
 
     if(cachedItem === null) {
-      ...
+      ....
       await this.memcachedService.setWithMeta<User, Cached<User>>(
         id, user, { superjson: true }
       );
-      ...
+      ....
 
       return user;
     }
@@ -391,9 +398,100 @@ export class UsersFacade {
 }
 ```
 
+### Extra Providers
+
+This is one of the most recent additions.
+
+I was looking for a nice way to introduce logging after I created and published the `nestjs-log` [npm package](https://www.npmjs.com/package/@andreafspeziale/nestjs-log).
+
+My thoughts were:
+
+- `nestjs-log`
+  - can be declared as _peerDependency_ and be installed as _devDependency_ of consumer packages which may need logging
+  - can be installed as _dependency_ of applications which will need logging for sure
+- `nestjs-memcached`
+  - can be a `nestjs-log` consumer
+  - can be installed as _dependency_ of applications (or even packages, why not?) which will need caching
+- `application` which can install both the above packages and orchestrate everything like configs and Providers DI
+
+A visual representation can be
+
+<div align="center">
+  <p>
+    <img src="./assets/extra-providers.png" width="800" alt="Extra Providers Example" />
+  </p>
+</div>
+
+In terms of code, in `nestjs-memcached` itself:
+
+```ts
+import { Injectable, Optional } from '@nestjs/common';
+import { LoggerService } from '@andreafspeziale/nestjs-log';
+import {
+  InjectMemcachedOptions,
+  InjectMemcached,
+  InjectMemcachedLogger,
+} from './memcached.decorators';
+....
+
+@Injectable()
+export class MemcachedService {
+  ....
+  constructor(
+    @InjectMemcachedOptions()
+    private readonly memcachedModuleOptions: MemcachedModuleOptions,
+    @InjectMemcached() private readonly memcachedClient: MemcachedClient,
+    @Optional()
+    @InjectMemcachedLogger()
+    private readonly logger?: LoggerService,
+  ) {
+    this.memcachedModuleOptions.log && this.logger?.setContext(MemcachedService.name);
+
+    ....
+  }
+}
+```
+
+In your application:
+
+`src/core/core.module.ts`
+
+```ts
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { LoggerModule, LoggerService } from '@andreafspeziale/nestjs-log';
+import { getMemcachedLoggerToken, MemcachedModule } from '@andreafspeziale/nestjs-memcached';
+import config, { envSchema, Config } from '../config';
+
+@Module({
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [config],
+      validationSchema: envSchema,
+    }),
+    LoggerModule.forRootAsync({
+      useFactory: (cs: ConfigService<Config, true>) => cs.get<Config['logger']>('logger'),
+      inject: [ConfigService],
+    }),
+    MemcachedModule.forRootAsync({
+      useFactory: (cs: ConfigService<Config, true>) => cs.get<Config['memcached']>('memcached'),
+      inject: [ConfigService],
+      extraProviders: [{ provide: getMemcachedLoggerToken(), useExisting: LoggerService }],
+    }),
+    ....
+  ],
+})
+export class CoreModule {}
+```
+
+The above `extraProviders` option is optional and the actual logging is driven by:
+
+- the application logger level configured within the `LoggerModule`
+- the `MemcachedModule` `log` configuration key
+
 ## Test
 
-- `docker compose -f docker-compose.test.yml up -d`
+- `docker compose -f compose-test.yaml up -d`
 - `pnpm test`
 
 ## Stay in touch

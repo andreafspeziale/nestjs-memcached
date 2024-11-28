@@ -1,4 +1,4 @@
-import { ModuleMetadata, Type } from '@nestjs/common';
+import { ModuleMetadata, Provider, Type } from '@nestjs/common';
 import Memcached from 'memcached';
 import { stringify, parse } from 'superjson';
 
@@ -34,11 +34,14 @@ export interface Processors<T = unknown, R = BaseWrapper<T>> {
 export interface MemcachedModuleOptions<T = unknown, R = BaseWrapper<T> & Record<string, unknown>>
   extends CachingOptions,
     Processors<T, R> {
-  connections?: MemcachedConnections[];
+  connections?:
+    | MemcachedConnections[]
+    | { locations?: MemcachedConnections[]; options?: Memcached.options };
   superjson?: boolean;
+  log?: boolean;
 }
 
-export interface MemcachedConfig<T = unknown, R = BaseWrapper<T>> {
+export interface MemcachedConfig<T = unknown, R = BaseWrapper<T> & Record<string, unknown>> {
   memcached: MemcachedModuleOptions<T, R>;
 }
 
@@ -73,4 +76,5 @@ export interface MemcachedModuleAsyncOptions extends Pick<ModuleMetadata, 'impor
   useClass?: Type<MemcachedModuleOptionsFactory>;
   useExisting?: Type<MemcachedModuleOptionsFactory>;
   useFactory?: (...args: any[]) => Promise<MemcachedModuleOptions> | MemcachedModuleOptions;
+  extraProviders?: Provider[];
 }

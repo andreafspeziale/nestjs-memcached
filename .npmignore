@@ -5,7 +5,7 @@
 .eslintrc.js
 .prettierrc
 .release-it.json
-docker-compose.test.yml
+compose*
 jest.config.js
 pnpm-lock.yaml
 tsconfig.build.json
@@ -15,3 +15,4 @@ renovate.json
 .editorconfig
 .nvmrc
 assets
+andreafspeziale-*

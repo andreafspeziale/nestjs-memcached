@@ -1,0 +1,6 @@
+services:
+  cache:
+    container_name: nestjs-memcached
+    image: memcached:1.6.32-alpine3.20
+    ports:
+      - 11211:11211

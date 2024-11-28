@@ -1,16 +1,24 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import { LoggerLevel, LoggerModule, LoggerService } from '@andreafspeziale/nestjs-log';
 import {
   MemcachedService,
   MemcachedModule,
   CachingOptions,
   WrappedValue,
   MemcachedModuleOptions,
+  getMemcachedLoggerToken,
 } from '../';
+import { LOGGER_INVOCATION_BY_API_COUNT_MAP } from './test.constants';
 
+// Some random configs options
 describe('MemcachedService (e2e)', () => {
   (
     [
+      {
+        options: {
+          ttl: 60,
+        },
+      },
       {
         options: {
           connections: [
@@ -19,6 +27,33 @@ describe('MemcachedService (e2e)', () => {
               port: 11211,
             },
           ],
+          ttl: 60,
+        },
+      },
+      {
+        options: {
+          connections: {
+            options: {
+              poolSize: 1,
+            },
+          },
+          ttl: 60,
+          superjson: false,
+        },
+      },
+      {
+        options: {
+          connections: {
+            locations: [
+              {
+                host: 'localhost',
+                port: 11211,
+              },
+            ],
+            options: {
+              poolSize: 1,
+            },
+          },
           ttl: 60,
           superjson: true,
         },
@@ -35,24 +70,39 @@ describe('MemcachedService (e2e)', () => {
             createdAt: new Date(),
           }),
           keyProcessor: (key: string): string => `v_${key}`,
+          log: true,
         },
       },
     ] as { [key: string]: unknown; options: MemcachedModuleOptions }[]
   ).forEach(({ options }) =>
     describe(`Module with options: ${JSON.stringify(options)}`, () => {
-      let app: INestApplication;
+      let moduleRef: TestingModule;
+
+      let logger: LoggerService;
+      let loggerDebugMethodSpy: jest.SpyInstance<
+        ReturnType<LoggerService['debug']>,
+        Parameters<LoggerService['debug']>
+      >;
+
       let memcachedService: MemcachedService;
 
       beforeAll(async () => {
-        const moduleRef: TestingModule = await Test.createTestingModule({
-          imports: [MemcachedModule.forRoot(options)],
+        moduleRef = await Test.createTestingModule({
+          imports: [
+            LoggerModule.forRoot({ level: LoggerLevel.Silent }),
+            MemcachedModule.forRoot(options, [
+              { provide: getMemcachedLoggerToken(), useExisting: LoggerService },
+            ]),
+          ],
         }).compile();
 
-        app = moduleRef.createNestApplication();
+        logger = await moduleRef.resolve(getMemcachedLoggerToken());
 
-        memcachedService = app.get(MemcachedService);
+        // * Spy intercepts the method calls at the code level,
+        // * before Winston's internal logic decides whether to actually log or not.
+        loggerDebugMethodSpy = jest.spyOn(logger, 'debug');
 
-        await app.init();
+        memcachedService = moduleRef.get(MemcachedService);
       });
 
       describe('setWithMeta & get', () => {
@@ -75,6 +125,13 @@ describe('MemcachedService (e2e)', () => {
               ? expect(cached?.createdAt).toBeInstanceOf(Date)
               : expect(typeof cached?.createdAt).toBe('string');
           }
+
+          options.log
+            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['setWithMeta'] +
+                  LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
+              )
+            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
 
         it('Should return the value of the cached key/value pair with override keyProcessor', async () => {
@@ -100,6 +157,13 @@ describe('MemcachedService (e2e)', () => {
               ? expect(cached?.createdAt).toBeInstanceOf(Date)
               : expect(typeof cached?.createdAt).toBe('string');
           }
+
+          options.log
+            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['setWithMeta'] +
+                  LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
+              )
+            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
 
         it('Should return the value of the cached key/value pair along with specified ttl', async () => {
@@ -121,6 +185,13 @@ describe('MemcachedService (e2e)', () => {
               ? expect(cached?.createdAt).toBeInstanceOf(Date)
               : expect(typeof cached?.createdAt).toBe('string');
           }
+
+          options.log
+            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['setWithMeta'] +
+                  LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
+              )
+            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
 
         it('Should return the value of the cached key/value pair along with specified ttl and ttr', async () => {
@@ -145,6 +216,13 @@ describe('MemcachedService (e2e)', () => {
               ? expect(cached?.createdAt).toBeInstanceOf(Date)
               : expect(typeof cached?.createdAt).toBe('string');
           }
+
+          options.log
+            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['setWithMeta'] +
+                  LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
+              )
+            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
 
         it('Should return the value of the cached key/value with override wrapperProcessor', async () => {
@@ -174,6 +252,13 @@ describe('MemcachedService (e2e)', () => {
 
           expect(cached?.test).toBeDefined();
           expect(cached?.test).toBe('test');
+
+          options.log
+            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['setWithMeta'] +
+                  LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
+              )
+            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
 
         it('Should return the value of the cached key/value pair as complex object', async () => {
@@ -212,6 +297,13 @@ describe('MemcachedService (e2e)', () => {
               ? expect(cached?.createdAt).toBeInstanceOf(Date)
               : expect(typeof cached?.createdAt).toBe('string');
           }
+
+          options.log
+            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['setWithMeta'] +
+                  LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
+              )
+            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
       });
 
@@ -224,6 +316,13 @@ describe('MemcachedService (e2e)', () => {
           const cached = await memcachedService.get('key');
 
           expect(cached).toBe('value');
+
+          options.log
+            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] +
+                  LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
+              )
+            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
 
         it('Should return the value of the cached key/value with override keyProcessor', async () => {
@@ -238,6 +337,13 @@ describe('MemcachedService (e2e)', () => {
           });
 
           expect(cached).toBe('value');
+
+          options.log
+            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] +
+                  LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
+              )
+            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
 
         it('Should return a Date object only if superjson is active', async () => {
@@ -247,6 +353,13 @@ describe('MemcachedService (e2e)', () => {
           options.superjson
             ? expect(result).toBeInstanceOf(Date)
             : expect(typeof result).toBe('string');
+
+          options.log
+            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] +
+                  LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
+              )
+            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
 
         it('Should always return a number when set', async () => {
@@ -254,6 +367,10 @@ describe('MemcachedService (e2e)', () => {
           const result = await memcachedService.get('key');
 
           expect(result).toBe(1);
+
+          options.log
+            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(3 + 3)
+            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
 
         it('Should return the value of the cached key/value pair as complex object', async () => {
@@ -283,12 +400,25 @@ describe('MemcachedService (e2e)', () => {
           options.superjson
             ? expect(date).toBeInstanceOf(Date)
             : expect(typeof date).toBe('string');
+
+          options.log
+            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] +
+                  LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
+              )
+            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
 
         it('Should return null', async () => {
           const cached = await memcachedService.get('key');
 
           expect(cached).toBe(null);
+
+          options.log
+            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
+              )
+            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
       });
 
@@ -301,6 +431,13 @@ describe('MemcachedService (e2e)', () => {
           const cached = await memcachedService.get('key');
 
           expect(cached).toBe('value');
+
+          options.log
+            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['add'] +
+                  LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
+              )
+            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
 
         it('Should return the value of the cached key/value with override keyProcessor', async () => {
@@ -315,6 +452,13 @@ describe('MemcachedService (e2e)', () => {
           });
 
           expect(cached).toBe('value');
+
+          options.log
+            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['add'] +
+                  LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
+              )
+            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
 
         it('Should return a Date object only if superjson is active', async () => {
@@ -324,6 +468,13 @@ describe('MemcachedService (e2e)', () => {
           options.superjson
             ? expect(result).toBeInstanceOf(Date)
             : expect(typeof result).toBe('string');
+
+          options.log
+            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['add'] +
+                  LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
+              )
+            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
 
         it('Should always return a number when set', async () => {
@@ -331,6 +482,13 @@ describe('MemcachedService (e2e)', () => {
           const result = await memcachedService.get('key');
 
           expect(result).toBe(1);
+
+          options.log
+            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['add'] +
+                  LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
+              )
+            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
 
         it('Should return the value of the cached key/value pair as complex object', async () => {
@@ -360,16 +518,30 @@ describe('MemcachedService (e2e)', () => {
           options.superjson
             ? expect(date).toBeInstanceOf(Date)
             : expect(typeof date).toBe('string');
+
+          options.log
+            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['add'] +
+                  LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
+              )
+            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
 
         it('Should return false if cached key/value pair already exists', async () => {
           await memcachedService.add('key', 'value');
 
-          await expect(memcachedService.add('key', 'value2')).rejects.toThrowError({
+          await expect(memcachedService.add('key', 'value2')).rejects.toThrow({
             name: 'OperationalError',
             message: 'Item is not stored',
             cause: new Error('Item is not stored'),
           });
+
+          options.log
+            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['add'] +
+                  LOGGER_INVOCATION_BY_API_COUNT_MAP['add'],
+              )
+            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
       });
 
@@ -383,6 +555,13 @@ describe('MemcachedService (e2e)', () => {
           const result = await memcachedService.incr('key', incr);
 
           expect(result).toBe(curr + incr);
+
+          options.log
+            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] +
+                  LOGGER_INVOCATION_BY_API_COUNT_MAP['incr'],
+              )
+            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
 
         it('Should correclty increment the key numeric value with override keyProcessor', async () => {
@@ -398,22 +577,42 @@ describe('MemcachedService (e2e)', () => {
           });
 
           expect(result).toBe(curr + incr);
+
+          options.log
+            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] +
+                  LOGGER_INVOCATION_BY_API_COUNT_MAP['incr'],
+              )
+            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
 
         it('Should return false since key has never been set as whatever', async () => {
           const result = await memcachedService.incr('key', 1);
 
           expect(result).toBe(false);
+
+          options.log
+            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['incr'],
+              )
+            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
 
         it('Should throw Error if key value is set but not numeric', async () => {
           await memcachedService.set('key', 'value');
 
-          await expect(memcachedService.incr('key', 1)).rejects.toThrowError({
+          await expect(memcachedService.incr('key', 1)).rejects.toThrow({
             name: 'OperationalError',
             message: 'cannot increment or decrement non-numeric value',
             cause: new Error('cannot increment or decrement non-numeric value'),
           });
+
+          options.log
+            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] +
+                  LOGGER_INVOCATION_BY_API_COUNT_MAP['incr'],
+              )
+            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
       });
 
@@ -428,6 +627,14 @@ describe('MemcachedService (e2e)', () => {
           const result = await memcachedService.get('key');
 
           expect(result).toBe(curr + incr);
+
+          options.log
+            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] +
+                  LOGGER_INVOCATION_BY_API_COUNT_MAP['incr'] +
+                  LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
+              )
+            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
       });
 
@@ -441,6 +648,13 @@ describe('MemcachedService (e2e)', () => {
           const result = await memcachedService.decr('key', decr);
 
           expect(result).toBe(curr - decr);
+
+          options.log
+            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] +
+                  LOGGER_INVOCATION_BY_API_COUNT_MAP['decr'],
+              )
+            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
 
         it('Should correclty decrement returning 0 even if decrement goes negative', async () => {
@@ -452,6 +666,13 @@ describe('MemcachedService (e2e)', () => {
           const result = await memcachedService.decr('key', decr);
 
           expect(result).toBe(0);
+
+          options.log
+            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] +
+                  LOGGER_INVOCATION_BY_API_COUNT_MAP['decr'],
+              )
+            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
 
         it('Should correclty decrement the key numeric value with override keyProcessor', async () => {
@@ -467,6 +688,13 @@ describe('MemcachedService (e2e)', () => {
           });
 
           expect(result).toBe(curr - decr);
+
+          options.log
+            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] +
+                  LOGGER_INVOCATION_BY_API_COUNT_MAP['decr'],
+              )
+            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
 
         it('Should return 0 if try to decrement from 0', async () => {
@@ -478,22 +706,42 @@ describe('MemcachedService (e2e)', () => {
           const result = await memcachedService.decr('key', decr);
 
           expect(result).toBe(curr);
+
+          options.log
+            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] +
+                  LOGGER_INVOCATION_BY_API_COUNT_MAP['decr'],
+              )
+            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
 
         it('Should return false since key has never been set as whatever', async () => {
           const result = await memcachedService.decr('key', 1);
 
           expect(result).toBe(false);
+
+          options.log
+            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['decr'],
+              )
+            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
 
         it('Should throw Error if key value is set but not numeric', async () => {
           await memcachedService.set('key', 'value');
 
-          await expect(memcachedService.decr('key', 1)).rejects.toThrowError({
+          await expect(memcachedService.decr('key', 1)).rejects.toThrow({
             name: 'OperationalError',
             message: 'cannot increment or decrement non-numeric value',
             cause: new Error('cannot increment or decrement non-numeric value'),
           });
+
+          options.log
+            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] +
+                  LOGGER_INVOCATION_BY_API_COUNT_MAP['decr'],
+              )
+            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
       });
 
@@ -508,6 +756,14 @@ describe('MemcachedService (e2e)', () => {
           const result = await memcachedService.get('key');
 
           expect(result).toBe(curr - decr);
+
+          options.log
+            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] +
+                  LOGGER_INVOCATION_BY_API_COUNT_MAP['decr'] +
+                  LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
+              )
+            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
       });
 
@@ -518,22 +774,36 @@ describe('MemcachedService (e2e)', () => {
           const deleted = await memcachedService.del('key');
 
           expect(deleted).toBe(true);
+
+          options.log
+            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] +
+                  LOGGER_INVOCATION_BY_API_COUNT_MAP['del'],
+              )
+            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
 
         it('Should return false since key/value has never been cached', async () => {
           const deleted = await memcachedService.del('key');
 
           expect(deleted).toBe(false);
+
+          options.log
+            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['del'],
+              )
+            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
         });
       });
 
       afterEach(async () => {
         await memcachedService.flush();
+        // * After flush otherwise flush will be counted in the next test iteration
+        loggerDebugMethodSpy.mockClear();
       });
 
       afterAll(async () => {
-        memcachedService.end();
-        await app.close();
+        await moduleRef.close();
       });
     }),
   );
