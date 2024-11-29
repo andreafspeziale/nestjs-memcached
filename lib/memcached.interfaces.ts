@@ -1,8 +1,10 @@
 import { ModuleMetadata, Provider, Type } from '@nestjs/common';
-import Memcached from 'memcached';
+import type Memcached from 'memcached';
 import { stringify, parse } from 'superjson';
 
-export type MemcachedClient = Memcached;
+export interface MemcachedClient extends Memcached {}
+
+export interface MemcachedOptions extends Memcached.options {}
 
 export interface CachingOptions {
   ttl: number;
@@ -36,7 +38,7 @@ export interface MemcachedModuleOptions<T = unknown, R = BaseWrapper<T> & Record
     Processors<T, R> {
   connections?:
     | MemcachedConnections[]
-    | { locations?: MemcachedConnections[]; options?: Memcached.options };
+    | { locations?: MemcachedConnections[]; options?: MemcachedOptions };
   superjson?: boolean;
   log?: boolean;
 }
