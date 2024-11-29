@@ -55,7 +55,7 @@ importers:
         specifier: ^29.5.2
         version: 29.5.14
       '@types/memcached':
-        specifier: 2.2.10
+        specifier: ^2.2.10
         version: 2.2.10
       '@typescript-eslint/eslint-plugin':
         specifier: ^7.18.0
@@ -4599,7 +4599,7 @@ snapshots:
 
   '@types/memcached@2.2.10':
     dependencies:
-      '@types/node': 22.2.0
+      '@types/node': 22.9.0
 
   '@types/node@22.2.0':
     dependencies:

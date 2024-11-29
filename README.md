@@ -61,7 +61,7 @@ import { MemcachedModule } from '@andreafspeziale/nestjs-memcached';
       connections: [
         {
           host: 'localhost',
-          port: '11211',
+          port: 11211,
         },
       ],
       ttl: 60,
@@ -82,7 +82,7 @@ import { MemcachedModule } from '@andreafspeziale/nestjs-memcached';
 export class CoreModule {}
 ```
 
-- For signle connection you can omit the `connections` property
+- For localhost single connection you can omit the `connections` property. Alternatively `connections: { locations: [{ host: 'localhost', port: 11211 }], options: { poolSize: 20 } }` or simply `connections: { options: { poolSize: 20 } }`
 - For multiple connections you can omit the `port` property if the server is using the default one
 - `ttl` is the global time to live
 - `ttr` is the global optional time to refresh
