@@ -1,5 +1,12 @@
 
 
+## [3.7.1](https://github.com/andreafspeziale/nestjs-memcached/compare/3.7.0...3.7.1) (2024-11-29)
+
+
+### Bug Fixes
+
+* types ([2677aca](https://github.com/andreafspeziale/nestjs-memcached/commit/2677aca2ce0e12fe4fde2f12430afbdb616cf847))
+
 ## [3.7.0](https://github.com/andreafspeziale/nestjs-memcached/compare/3.6.0...3.7.0) (2024-11-28)
 
 
