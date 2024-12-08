@@ -21,6 +21,16 @@
   <p>
 </div>
 
+## From v3 to v4
+
+TLDR:
+
+- New module options
+- New underlying memcached client, <a href="https://bun.sh" target="blank">Bun</a> compatible
+- `superjson` is no more a module option, it's used as the default serializer
+- `.setWithMeta` API has been removed, now there is only `.set`
+- `wrapperProcessor` option has been splitted in a more generic purpose functions `getProcessor` and `setProcessor`
+
 ## Installation
 
 ### npm
@@ -53,28 +63,34 @@ The module is <a href="https://docs.nestjs.com/modules#global-modules" target="b
 
 ```ts
 import { Module } from '@nestjs/common';
-import { MemcachedModule } from '@andreafspeziale/nestjs-memcached';
+import { MemcachedModule, CachableValue } from '@andreafspeziale/nestjs-memcached';
 
 @Module({
   imports: [
-    MemcachedModule.forRoot({
-      connections: [
-        {
-          host: 'localhost',
-          port: 11211,
-        },
-      ],
-      ttl: 60,
-      ttr: 30,
-      superjson: true,
-      keyProcessor: (key) => `prefix_${key}`,
-      wrapperProcessor: ({ value, ttl, ttr }) => ({
-        content: value,
-        ttl,
-        ...(ttr ? { ttr } : {}),
-        createdAt: new Date(),
-      }),
-      log: true,
+    MemcachedModule.forRoot<{
+      content: CachableValue;
+      version?: string;
+    }>({
+      connection: { host: '0.0.0.0', port: 11211 },
+      lifetimes: { ttl: 60, ttr: 30 },
+      version: '1',
+      prefix: 'api',
+      keyProcessor: {
+        fn: ({ prefix, version, key }) =>
+          `${prefix ? prefix + '::' : ''}${version ? version + '::' : ''}${key}`,
+        disable: true,
+      },
+      getProcessor: {
+        fn: ({ content }) => content,
+        disable: true,
+      },
+      setProcessor: {
+        fn: ({ value, version }) => ({
+          content: value,
+          ...(version ? { version } : {}),
+        }),
+        disable: true,
+      },
     }),
   ],
   ....
@@ -82,14 +98,16 @@ import { MemcachedModule } from '@andreafspeziale/nestjs-memcached';
 export class CoreModule {}
 ```
 
-- For localhost single connection you can omit the `connections` property. Alternatively `connections: { locations: [{ host: 'localhost', port: 11211 }], options: { poolSize: 20 } }` or simply `connections: { options: { poolSize: 20 } }`
-- For multiple connections you can omit the `port` property if the server is using the default one
-- `ttl` is the global time to live
-- `ttr` is the global optional time to refresh
-- Typically when caching a JS object like `Date` you will get back a `string` from the cache, [superjson](https://github.com/blitz-js/superjson) will `stringify` on cache `sets` adding metadata in order to later `parse` on cache `gets` and retrieve the initial "raw" data
+- `connection` can be omitted in case of `localhost` connection
+- `lifetimes.ttl` is the global time to live
+- `lifetimes.ttr` is the global optional time to refresh
+- `version` is an optional string which will be injected in `keyProcessor`, `getProcessor` and `setProcessor` in order to eventually enrich data
+- `prefix` is an optional string which will be injected in `keyProcessor`, `getProcessor` and `setProcessor` in order to eventually enrich data
 - `keyProcessor` is the global optional key processor function which process your cache keys
-- `wrapperProcessor` is the global optional wrapper processor function which wraps the value to be cached and adds metadata
-- `log` enable or disable logging (`LoggerService` must be provided, check Extra Providers section)
+- `getProcessor` is the global optional get processor function which can unwrap the cached value
+- `setProcessor` is the global optional set processor function which can add metadata wrapping the value to be cached
+
+Test files are full of configuration shapes.
 
 #### MemcachedModule.forRootAsync(options)
 
@@ -165,28 +183,187 @@ export class SamplesFacade {
   ) {}
 
   async sampleMethod(): Promise<SampleReturnType> {
-    const cachedItem = await this.memcachedService.get<string>('key');
+    const cachedItem = await this.memcachedService.get<string>('my-key');
 
     if(cachedItem === null) {
       ....
-      await this.memcachedService.set<string>('key', 'value');
+      await this.memcachedService.set<string>('my-key', 'my-value');
       ....
     }
   }
 }
 ```
 
-You can also set all the proper `Processors` and `CachingOptions` inline in order to override the global values specified during the `MemcachedModule` import
+### APIs
+
+`getProcessor` (in `.get` API) and `setProcessor` (in `.set` API) are optional functions which can be defined globally when the Memcached NestJS module is initialized, along with all the other options.
+
+Both processors and options can be overwritten or even disabled inline.
+
+Since bad thigs may happen, even using TS, inline `getProcessor` and `setProcessor` capabilities can change based on the provided generic types.
+
+Let's suppose you setted up globally both, `getProcessor` and `setProcessor`, disabling inline `setProcessor` may result in unexpected behaviours when the `.get` API will run the global `getProcessor` under the hood.
+
+Types will force you thinking a lil'bit more about what you are doing.
+
+BTW for fast prototyping/debugging we both know about the `any` type ;-).
+
+### Get API
+
+> Both global or inline `getProcessor` are not executed if the underlying `.get` API is returning `false` (which I translate in `null` to let the consumer cache `boolean`) for a given caching key
+
+#### A. Implicit
+
+We don't know what `my-key` will return, so `a` will be a `CachableValue | null`
 
 ```ts
-await this.memcachedService.set<string>('key', 'value', { ttl: 100 });
+const a = await this.memcachedService.get('my-key');
 ```
 
-The exported `MemcachedService` is an opinionated wrapper around [memcached](https://github.com/3rd-Eden/memcached#readme) trying to be unopinionated as much as possibile at the same time.
+TS will infer
 
-`setWithMeta` enables `refresh-ahead` cache pattern in order to let you add a logical expiration called `ttr (time to refresh)` to the cached data and more.
+`MemcachedService.get<never, never>(key: string, options?:...`
 
-So each time you get some cached data it will contain additional properties in order to help you decide whatever business logic needs to be applied.
+In the above scenario, `getProcessor` cannot be used.
+
+#### B. First generic TS arg made explicit
+
+First generic TS arg made explicit. `b` will be typed as `string | null`
+
+```ts
+const b = await this.memcachedService.get<string>('my-key');
+```
+
+TS will infer
+
+`MemcachedService.get<string, never>(key: string, value: "my-value", options?:...`
+
+In the above scenario, `getProcessor` can only be and eventually disabled
+
+```ts
+const b = await this.memcachedService.get('my-key', { getProcessor: { disable: true } });
+```
+
+#### C. First and second generic TS arg made explicit
+
+`c` will be typed as `string | null`.
+
+`{ content: string }` is what has been actually cached and is intended to be processed inline
+
+```ts
+const c = await this.memcachedService.get<string, { content: string }>('my-key', {
+  getProcessor: { fn: (i) => i.content },
+});
+```
+
+#### D. Full options
+
+`d` will be typed as `string | null` and `.get` second arg is an optional "options" object
+
+- `lifetimes` is an optional object in which
+  - `ttl` is a required `number`
+  - `ttr` is an optional `number`
+- `version` is an optional `string`
+- `prefix` is an optional `string`
+- `keyProcessor` is an optional function which can manipulate the caching key
+- `getProcessor` is an optional function which can manipulate the cached value
+
+```ts
+const d = await this.memcachedService.get<string, { content: string }>('my-key', {
+  lifetimes: { ttl: 20, ttr: 10 },
+  version: '1',
+  prefix: 'api',
+  keyProcessor: {
+    fn: ({ key, version }) => `${version ? version + '::' : ''}${key}`, // "version", "ttl", "ttr" and "prefix" are injected into the function along with the actual "key"
+    disable: true, // global and inline "keyProcessor" execution are ignored
+  },
+  getProcessor: {
+    fn: ({ content }) => content, // "fn" input is "{ content: string }" and the output is "string" as defined in the generic args
+    disable: true, // global and inline "getProcessor" execution are ignored - in this scenario you probably need to specify just the first generic arg.
+  },
+});
+```
+
+### Set API
+
+> `.set` will return a `Promise<void>` or will throw a `MemcachedException` if something were to break. Type annotations will help you enforce what is going to be cached
+
+> What can be cached is a custom subset of what the `superjson` library can serialize
+
+#### A. Implicit
+
+As far as a `CachableValue` is cached, "you good"
+
+```ts
+await this.memcachedService.set('my-key', 'my-value');
+```
+
+TS will infer
+
+`MemcachedService.set<"my-value", never>(key: string, value: "my-value", options?:...`
+
+In the above scenario, `setProcessor` can only be and eventually disabled
+
+```ts
+await this.memcachedService.set('my-key', 'my-value', { setProcessor: { disable: true } });
+```
+
+#### B. First generic TS arg made explicit
+
+```ts
+await this.memcachedService.set<string>('my-key', 'my-value');
+await this.memcachedService.set<string>('my-key', 1); // TS will be complaining because 1 is not a "string"
+```
+
+In the above scenario, `setProcessor` can only be and eventually disabled
+
+```ts
+await this.memcachedService.set('my-key', 'my-value', { setProcessor: { disable: true } });
+```
+
+#### C. First and second generic TS arg made explicit
+
+```ts
+await this.memcachedService.set<string, { content: string; created: Date }>('my-key', 'my-value', {
+  setProcessor: { fn: (i) => ({ content: i.value, created: new Date() }) },
+});
+
+await this.memcachedService.set<string, { content: string; created: Date }>('my-key', 'my-value', {
+  setProcessor: {
+    fn: (i) => ({
+      content: i.value,
+      created: new Date().toISOString(), // TS will be complaining because "created" is a "string" instead of a Date object
+    }),
+  },
+});
+```
+
+#### D. Full options
+
+`.set` third arg is an optional "options" object
+
+- `lifetimes` is an optional object in which
+  - `ttl` is a required `number`
+  - `ttr` is an optional `number`
+- `version` is an optional `string`
+- `keyProcessor` is an optional function which can manipulate the caching key
+- `setProcessor` is an optional function which can manipulate the cached value
+
+```ts
+await this.memcachedService.set<string, { content: string }>('my-key', 'my-value' {
+  lifetimes: { ttl: 20, ttr: 10 },
+  version: '1',
+  keyProcessor: {
+    fn: ({ key, version, ttl, ttr }) =>
+      `${version ? version + '::' : ''}${key}`, // "version", "ttl", "ttr" and "prefix" are injected into the function along with the actual "key"
+    disable: true, // global and inline "keyProcessor" execution are ignored
+  },
+  setProcessor: {
+    fn: ({ value, version, ttl, ttr, prefix }) => ({ content: value }), // "version", "ttl", "ttr" and "prefix" are injected into the function along with the actual "value"
+    disable: true, // global and inline "setProcessor" execution are ignored
+  },
+});
+```
 
 ### Health
 
@@ -198,6 +375,7 @@ I usually expose an `/healthz` controller from my microservices in order to chec
 
 ```ts
 import { Controller, Get } from '@nestjs/common';
+import { MEMCACHED_HOST, MEMCACHED_PORT } from '@andreafspeziale/nestjs-memcached';
 import {
   HealthCheckService,
   HealthCheckResult,
@@ -223,8 +401,8 @@ export class HealthController {
         this.microservice.pingCheck('memcached', {
           transport: Transport.TCP,
           options: {
-            host: this.cs.get<Config['memcached']>('memcached').connections?.[0].host,
-            port: this.cs.get<Config['memcached']>('memcached').connections?.[0].port,
+            host: this.cs.get<Config['memcached']>('memcached').connection?.host || MEMCACHED_HOST,
+            port: this.cs.get<Config['memcached']>('memcached').connection?.port || MEMCACHED_PORT,
           },
         }),
     ]);
@@ -232,170 +410,26 @@ export class HealthController {
 }
 ```
 
-### Validation
+### Environment variables management
 
-As mentioned above I usually init my `DynamicModules` injecting the `ConfigService` exposed by the `ConfigModule` (`@nestjs/config` package). This is where I validate my environment variables using a schema validator of my choice, so far I tried `joi`, `class-validator` and `zod`.
+Please refer to <a href="https://github.com/andreafspeziale/nestjs-search" target="blank">`@andreafspeziale/nestjs-search`</a> for more info about the environment variables features exported from my packages.
 
-This is an example using `joi` but you should tailor it based on your needs, starting by defining a `Config` interface:
+`nestjs-memcached` exports some features as well.
 
-`src/config/config.interfaces.ts`
+#### Zod
 
 ```ts
-import {
-  BaseWrapper,
-  MemcachedConfig,
-} from '@andreafspeziale/nestjs-memcached';
+import { memcachedSchema } from '@andreafspeziale/nestjs-memcached/dist/zod';
 
-
-
-/**
- * Cached data shape leveraging metadata feature
- * {
- *   content: T;
- *   ttl: number;
- *   ttr?: number;
- *   version: number;
- *   created: Date;
- * }
- */
-export interface CachedMetaConfig {
-  version: number;
-  created: Date;
-}
-
-export type Cached<T = unknown> = BaseWrapper<T> & CachedMetaConfig;
-
-export type Config = .... & MemcachedConfig<unknown, Cached>;
+....
 ```
 
-`src/config/config.schema.ts`
+#### Joi
 
 ```ts
-import {
-  MEMCACHED_HOST,
-  MEMCACHED_PORT,
-  MEMCACHED_TTL,
-  MEMCACHED_TTR,
-  MEMCACHED_VERSION
-} from '@andreafspeziale/nestjs-memcached';
-import {
-  MEMCACHED_PREFIX
-} from './config.defaults';
+import { MEMCACHED_SCHEMA } from '@andreafspeziale/nestjs-memcached/dist/joi';
 
-const BASE_SCHEMA = ....;
-
-const MEMCACHED_SCHEMA = Joi.object({
-  MEMCACHED_HOST: Joi.string().default(MEMCACHED_HOST),
-  MEMCACHED_PORT: Joi.number().default(MEMCACHED_PORT),
-  MEMCACHED_TTL: Joi.number().default(MEMCACHED_TTL),
-  MEMCACHED_TTR: Joi.number().less(Joi.ref('MEMCACHED_TTL')).default(MEMCACHED_TTR),
-  MEMCACHED_PREFIX: Joi.string().default(MEMCACHED_PREFIX),
-  MEMCACHED_VERSION: Joi.number().default(MEMCACHED_VERSION),
-});
-
-export const envSchema = Joi.object()
-  .concat(BASE_SCHEMA);
-  .concat(MEMCACHED_SCHEMA)
-```
-
-`src/config/index.ts`
-
-```ts
-import { Config } from './config.interfaces';
-
-export * from './config.interfaces';
-export * from './config.schema';
-
-export default (): Config => ({
-  ....,
-  memcached: {
-    connections: [
-      {
-        host: process.env.MEMCACHED_HOST,
-        port: parseInt(process.env.MEMCACHED_PORT, 10),
-      },
-    ],
-    ttl: parseInt(process.env.MEMCACHED_TTL, 10),
-    ...(process.env.MEMCACHED_TTR ? { ttr: parseInt(process.env.MEMCACHED_TTR, 10) } : {}),
-    wrapperProcessor: ({ value, ttl, ttr }) => ({
-      content: value,
-      ttl,
-      ...(ttr ? { ttr } : {}),
-      version: parseInt(process.env.MEMCACHED_VERSION, 10),
-      created: new Date(),
-    }),
-    keyProcessor: (key: string) =>
-      `${process.env.MEMCACHED_PREFIX}::V${process.env.MEMCACHED_VERSION}::${key}`,
-  },
-});
-```
-
-`src/core/core.module.ts`
-
-```ts
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { MemcachedModule } from '@andreafspeziale/nestjs-memcached';
-import config, { envSchema, Config } from '../config';
-
-@Module({
-  imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-      load: [config],
-      validationSchema: envSchema,
-    }),
-    MemcachedModule.forRootAsync({
-      useFactory: (cs: ConfigService<Config, true>) => cs.get<Config['memcached']>('memcached'),
-      inject: [ConfigService],
-    }),
-    ....
-  ],
-})
-export class CoreModule {}
-```
-
-`src/users/users.facade.ts`
-
-```ts
-import { MemcachedService } from '@andreafspeziale/nestjs-memcached';
-import { Cached } from '../config';
-import { User } from './users.interfaces'
-
-@Injectable()
-export class UsersFacade {
-  constructor(
-    private readonly usersService: UsersService,
-    private readonly memcachedService: MemcachedService
-  ) {}
-
-  async getUser(id: string): Promise<User> {
-    const cachedUser = await this.memcachedService.get<Cached<User>(
-      id, { superjson: true }
-    );
-
-    /**
-     * Cached data shape leveraging metadata feature
-     * {
-     *   content: User;
-     *   ttl: number;
-     *   ttr?: number;
-     *   version: number;
-     *   created: Date;
-     * }
-     */
-
-    if(cachedItem === null) {
-      ....
-      await this.memcachedService.setWithMeta<User, Cached<User>>(
-        id, user, { superjson: true }
-      );
-      ....
-
-      return user;
-    }
-
-    return cachedUser.content;
-}
+....
 ```
 
 ### Extra Providers
@@ -430,7 +464,7 @@ import { LoggerService } from '@andreafspeziale/nestjs-log';
 import {
   InjectMemcachedOptions,
   InjectMemcached,
-  InjectMemcachedLogger,
+  InjectMemcachedOptionalLogger,
 } from './memcached.decorators';
 ....
 
@@ -442,7 +476,7 @@ export class MemcachedService {
     private readonly memcachedModuleOptions: MemcachedModuleOptions,
     @InjectMemcached() private readonly memcachedClient: MemcachedClient,
     @Optional()
-    @InjectMemcachedLogger()
+    @InjectMemcachedOptionalLogger()
     private readonly logger?: LoggerService,
   ) {
     this.memcachedModuleOptions.log && this.logger?.setContext(MemcachedService.name);
@@ -491,7 +525,7 @@ The above `extraProviders` option is optional and the actual logging is driven b
 
 ## Test
 
-- `docker compose -f compose-test.yaml up -d`
+- `docker compose up -d`
 - `pnpm test`
 
 ## Stay in touch

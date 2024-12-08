@@ -1,9 +1,10 @@
 import { DynamicModule, Global, Provider } from '@nestjs/common';
 import {
-  MemcachedClient,
   MemcachedModuleAsyncOptions,
-  MemcachedModuleOptions,
   MemcachedModuleOptionsFactory,
+  MemcachedModuleOptions,
+  MemcachedClient,
+  CachableValue,
 } from './memcached.interfaces';
 import { MemcachedService } from './memcached.service';
 import {
@@ -14,8 +15,8 @@ import {
 
 @Global()
 export class MemcachedModule {
-  public static forRoot(
-    options: MemcachedModuleOptions,
+  public static forRoot<ValueProcessorInputAndOutput extends CachableValue = CachableValue>(
+    options: MemcachedModuleOptions<ValueProcessorInputAndOutput>,
     extraProviders?: Provider[],
   ): DynamicModule {
     const optionsProvider: Provider = {
@@ -25,7 +26,7 @@ export class MemcachedModule {
 
     const clientProvider: Provider = {
       provide: getMemcachedClientToken(),
-      useValue: createMemcachedClient(options),
+      useValue: createMemcachedClient(options.connection),
     };
 
     return {
@@ -35,37 +36,50 @@ export class MemcachedModule {
     };
   }
 
-  static register(options: MemcachedModuleOptions, extraProviders?: Provider[]): DynamicModule {
-    return MemcachedModule.forRoot(options, extraProviders);
+  static register<ValueProcessorInputAndOutput extends CachableValue = CachableValue>(
+    options: MemcachedModuleOptions<ValueProcessorInputAndOutput>,
+    extraProviders?: Provider[],
+  ): DynamicModule {
+    return MemcachedModule.forRoot<ValueProcessorInputAndOutput>(options, extraProviders);
   }
 
-  public static forRootAsync(options: MemcachedModuleAsyncOptions): DynamicModule {
+  public static forRootAsync<ValueProcessorInputAndOutput extends CachableValue = CachableValue>(
+    options: MemcachedModuleAsyncOptions<ValueProcessorInputAndOutput>,
+  ): DynamicModule {
     const memcachedClientProvider: Provider = {
       provide: getMemcachedClientToken(),
-      useFactory: (opts: MemcachedModuleOptions): MemcachedClient =>
-        createMemcachedClient({ connections: opts.connections || [] }),
+      useFactory: (opts: MemcachedModuleOptions<ValueProcessorInputAndOutput>): MemcachedClient =>
+        createMemcachedClient(opts.connection),
       inject: [getMemcachedModuleOptionsToken()],
     };
 
     return {
       module: MemcachedModule,
       providers: [
-        ...this.createAsyncProviders(options),
         ...(options.extraProviders || []),
+        ...this.createAsyncProviders<ValueProcessorInputAndOutput>(options),
         memcachedClientProvider,
         MemcachedService,
       ],
-      exports: [...this.createAsyncProviders(options), memcachedClientProvider, MemcachedService],
+      exports: [
+        ...this.createAsyncProviders<ValueProcessorInputAndOutput>(options),
+        memcachedClientProvider,
+        MemcachedService,
+      ],
     };
   }
 
-  static registerAsync(options: MemcachedModuleAsyncOptions): DynamicModule {
-    return MemcachedModule.forRootAsync(options);
+  static registerAsync<ValueProcessorInputAndOutput extends CachableValue = CachableValue>(
+    options: MemcachedModuleAsyncOptions<ValueProcessorInputAndOutput>,
+  ): DynamicModule {
+    return MemcachedModule.forRootAsync<ValueProcessorInputAndOutput>(options);
   }
 
-  private static createAsyncProviders(options: MemcachedModuleAsyncOptions): Provider[] {
+  private static createAsyncProviders<
+    ValueProcessorInputAndOutput extends CachableValue = CachableValue,
+  >(options: MemcachedModuleAsyncOptions<ValueProcessorInputAndOutput>): Provider[] {
     if (options.useExisting || options.useFactory) {
-      return [this.createAsyncOptionsProvider(options)];
+      return [this.createAsyncOptionsProvider<ValueProcessorInputAndOutput>(options)];
     }
 
     if (options.useClass === undefined) {
@@ -73,7 +87,7 @@ export class MemcachedModule {
     }
 
     return [
-      this.createAsyncOptionsProvider(options),
+      this.createAsyncOptionsProvider<ValueProcessorInputAndOutput>(options),
       {
         provide: options.useClass,
         useClass: options.useClass,
@@ -81,7 +95,9 @@ export class MemcachedModule {
     ];
   }
 
-  private static createAsyncOptionsProvider(options: MemcachedModuleAsyncOptions): Provider {
+  private static createAsyncOptionsProvider<
+    ValueProcessorInputAndOutput extends CachableValue = CachableValue,
+  >(options: MemcachedModuleAsyncOptions<ValueProcessorInputAndOutput>): Provider {
     if (options.useFactory) {
       return {
         provide: getMemcachedModuleOptionsToken(),
@@ -97,8 +113,9 @@ export class MemcachedModule {
     return {
       provide: getMemcachedModuleOptionsToken(),
       useFactory: async (
-        optionsFactory: MemcachedModuleOptionsFactory,
-      ): Promise<MemcachedModuleOptions> => await optionsFactory.createMemcachedModuleOptions(),
+        optionsFactory: MemcachedModuleOptionsFactory<ValueProcessorInputAndOutput>,
+      ): Promise<MemcachedModuleOptions<ValueProcessorInputAndOutput>> =>
+        await optionsFactory.createMemcachedModuleOptions(),
       inject: [options.useExisting || options.useClass],
     };
   }
