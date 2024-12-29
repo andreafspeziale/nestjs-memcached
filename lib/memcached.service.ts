@@ -1,373 +1,507 @@
-import b from 'bluebird';
+import { parse, stringify } from 'superjson';
 import { Injectable, OnModuleDestroy, Optional } from '@nestjs/common';
 import { LoggerService } from '@andreafspeziale/nestjs-log';
-import { stringify, parse } from 'superjson';
-import {
-  MemcachedClient,
-  CachingOptions,
-  GetOptions,
-  KeyProcessor,
-  MemcachedModuleOptions,
-  SetOptions,
-  SetWithMetaOptions,
-  WrapperProcessor,
-  WrappedValue,
-  Parser,
-  IncrDecrOptions,
-  AddOptions,
-  DelOptions,
-} from './memcached.interfaces';
+import { MEMCACHED_HOST, MEMCACHED_PORT } from './memcached.defaults';
 import {
   InjectMemcached,
-  InjectMemcachedLogger,
+  InjectMemcachedOptionalLogger,
   InjectMemcachedOptions,
 } from './memcached.decorators';
-import { defaultWrapperProcessor } from './memcached.utils';
+import {
+  MemcachedModuleOptions,
+  CachableValue,
+  OptionalLifetimesOption,
+  OptionalVersionOption,
+  OptionalPrefixOption,
+  KeyProcessor,
+  OptionalKeyProcessorOption,
+  GetProcessor,
+  OptionalGetProcessorOption,
+  SetProcessor,
+  OptionalSetProcessorOption,
+  SetProcessorInput,
+  DisableGetProcessor,
+  DisableSetProcessor,
+  MemcachedClient,
+} from './memcached.interfaces';
+import { MemcachedException } from './memcached.exception';
 
 @Injectable()
 export class MemcachedService implements OnModuleDestroy {
-  private readonly client: ReturnType<typeof b.promisifyAll<MemcachedClient>>;
-  private readonly wrapperProcessor: WrapperProcessor;
-  private readonly keyProcessor: KeyProcessor | undefined;
-  private readonly parser: Parser;
+  private readonly keyProcessor?: KeyProcessor;
+  private readonly getProcessor?: GetProcessor;
+  private readonly setProcessor?: SetProcessor;
 
   constructor(
     @InjectMemcachedOptions()
     private readonly memcachedModuleOptions: MemcachedModuleOptions,
     @InjectMemcached() private readonly memcachedClient: MemcachedClient,
     @Optional()
-    @InjectMemcachedLogger()
+    @InjectMemcachedOptionalLogger()
     private readonly logger?: LoggerService,
   ) {
     this.memcachedModuleOptions.log && this.logger?.setContext(MemcachedService.name);
 
-    this.client = b.promisifyAll(this.memcachedClient);
+    if (memcachedModuleOptions.keyProcessor?.fn) {
+      this.keyProcessor = memcachedModuleOptions.keyProcessor.fn;
+    }
 
-    this.wrapperProcessor = memcachedModuleOptions.wrapperProcessor
-      ? memcachedModuleOptions.wrapperProcessor
-      : defaultWrapperProcessor;
+    if (memcachedModuleOptions.getProcessor?.fn) {
+      this.getProcessor = memcachedModuleOptions.getProcessor.fn;
+    }
 
-    this.keyProcessor = memcachedModuleOptions.keyProcessor;
-
-    this.parser = {
-      stringify,
-      parse,
-    };
+    if (memcachedModuleOptions.setProcessor?.fn) {
+      this.setProcessor = memcachedModuleOptions.setProcessor.fn;
+    }
   }
 
-  async setWithMeta<T, R = WrappedValue<T> & CachingOptions>(
+  async get<
+    Cached extends CachableValue = never,
+    ValueGetProcessorInput extends CachableValue = never,
+  >(
     key: string,
-    value: T,
-    options?: SetWithMetaOptions<T, R>,
-  ): Promise<boolean> {
-    const ttl = options?.ttl || this.memcachedModuleOptions.ttl;
+    options?: [Cached] extends [never]
+      ? [ValueGetProcessorInput] extends [never]
+        ? OptionalLifetimesOption &
+            OptionalVersionOption &
+            OptionalPrefixOption &
+            OptionalKeyProcessorOption
+        : OptionalLifetimesOption &
+            OptionalVersionOption &
+            OptionalPrefixOption &
+            OptionalKeyProcessorOption &
+            DisableGetProcessor
+      : [ValueGetProcessorInput] extends [never]
+        ? OptionalLifetimesOption &
+            OptionalVersionOption &
+            OptionalPrefixOption &
+            OptionalKeyProcessorOption &
+            DisableGetProcessor
+        : OptionalLifetimesOption &
+            OptionalVersionOption &
+            OptionalPrefixOption &
+            OptionalKeyProcessorOption &
+            OptionalGetProcessorOption<Cached, ValueGetProcessorInput>,
+  ): Promise<([Cached] extends [never] ? CachableValue : Cached) | null>;
 
-    const wrapperProcessorPayload = {
-      value,
-      ttl,
-      ...(options?.ttr
-        ? { ttr: options?.ttr }
-        : this.memcachedModuleOptions.ttr
-          ? { ttr: this.memcachedModuleOptions.ttr }
-          : {}),
-    };
+  async get<
+    Cached extends CachableValue = CachableValue,
+    ValueGetProcessorInput extends CachableValue = CachableValue,
+  >(
+    key: string,
+    options?: OptionalLifetimesOption &
+      OptionalVersionOption &
+      OptionalPrefixOption &
+      OptionalKeyProcessorOption &
+      OptionalGetProcessorOption<Cached, ValueGetProcessorInput>,
+  ): Promise<Cached | CachableValue | null> {
+    const { ttl, ttr } = options?.lifetimes
+      ? options?.lifetimes
+      : this.memcachedModuleOptions.lifetimes;
 
-    this.memcachedModuleOptions.log &&
-      this.logger?.debug('Ready to eventually process key...', {
-        fn: this.setWithMeta.name,
-        key,
-        value,
-        wrapperProcessorPayload,
-      });
+    const version = options?.version ? options.version : this.memcachedModuleOptions.version;
 
-    const processedKey = options?.keyProcessor
-      ? options.keyProcessor(key)
-      : this.keyProcessor
-        ? this.keyProcessor(key)
-        : key;
+    const prefix = options?.prefix ? options.prefix : this.memcachedModuleOptions.prefix;
 
-    this.memcachedModuleOptions.log &&
-      this.logger?.debug('Ready to wrap cache data with meta...', {
-        fn: this.setWithMeta.name,
-        key,
-        processedKey,
-        value,
-        wrapperProcessorPayload,
-      });
+    let processedkey: string;
+    let cachedProcessedValue: Cached | CachableValue | null;
 
-    const wrappedValue = options?.wrapperProcessor
-      ? options.wrapperProcessor(wrapperProcessorPayload)
-      : this.wrapperProcessor(wrapperProcessorPayload);
-
-    this.memcachedModuleOptions.log &&
-      this.logger?.debug('Ready to eventualy serialize data...', {
-        fn: this.setWithMeta.name,
-        key,
-        processedKey,
-        value,
-        wrapperProcessorPayload,
-        wrappedValue,
-      });
-
-    const searialized =
-      (options?.superjson || this.memcachedModuleOptions.superjson) && isNaN(Number(value))
-        ? this.parser.stringify(wrappedValue)
-        : wrappedValue;
-
-    this.memcachedModuleOptions.log &&
-      this.logger?.debug('Ready to cache with meta...', {
-        fn: this.setWithMeta.name,
-        key,
-        processedKey,
-        value,
-        wrapperProcessorPayload,
-        wrappedValue,
-        searialized,
-      });
-
-    return this.client.setAsync(processedKey, searialized, ttl);
-  }
-
-  async set<T>(key: string, value: T, options?: SetOptions): Promise<boolean> {
-    this.memcachedModuleOptions.log &&
-      this.logger?.debug('Ready to eventually process key...', {
-        fn: this.set.name,
-        key,
-        value,
-      });
-
-    const processedKey = options?.keyProcessor
-      ? options.keyProcessor(key)
-      : this.keyProcessor
-        ? this.keyProcessor(key)
-        : key;
-
-    this.memcachedModuleOptions.log &&
-      this.logger?.debug('Ready to eventually serialize data...', {
-        fn: this.set.name,
-        key,
-        processedKey,
-        value,
-      });
-
-    const serialized =
-      (options?.superjson || this.memcachedModuleOptions.superjson) && typeof value !== 'number'
-        ? this.parser.stringify(value)
-        : value;
-
-    this.memcachedModuleOptions.log &&
-      this.logger?.debug('Ready to cache...', {
-        fn: this.set.name,
-        key,
-        processedKey,
-        value,
-        serialized,
-      });
-
-    return this.client.setAsync(
-      processedKey,
-      serialized,
-      options?.ttl || this.memcachedModuleOptions.ttl,
-    );
-  }
-
-  async get<T = unknown>(key: string, options?: GetOptions): Promise<T | null> {
     this.memcachedModuleOptions.log &&
       this.logger?.debug('Ready to eventually process key...', {
         fn: this.get.name,
         key,
+        ttl,
+        ttr,
+        version,
+        prefix,
       });
 
-    const processedKey = options?.keyProcessor
-      ? options.keyProcessor(key)
-      : this.keyProcessor
-        ? this.keyProcessor(key)
-        : key;
+    try {
+      if (
+        options?.keyProcessor?.disable !== true &&
+        this.memcachedModuleOptions.keyProcessor?.disable !== true
+      ) {
+        const keyProcessorPayload = {
+          key,
+          ttl,
+          ...(ttr ? { ttr } : {}),
+          ...(version ? { version } : {}),
+          ...(prefix ? { prefix } : {}),
+        };
 
-    this.memcachedModuleOptions.log &&
-      this.logger?.debug('Ready to get data...', {
-        fn: this.get.name,
-        key,
-        processedKey,
+        processedkey = options?.keyProcessor?.fn
+          ? options?.keyProcessor.fn(keyProcessorPayload)
+          : this.keyProcessor
+            ? this.keyProcessor(keyProcessorPayload)
+            : key;
+      } else {
+        processedkey = key;
+      }
+
+      this.memcachedModuleOptions.log &&
+        this.logger?.debug('Checking connection...', {
+          fn: this.get.name,
+          key,
+          processedkey,
+          ttl,
+          ttr,
+          version,
+          prefix,
+        });
+
+      const ping = await this.memcachedClient.ping();
+
+      if (!ping) {
+        this.memcachedModuleOptions.log &&
+          this.logger?.error('Pre connection check failed', {
+            fn: this.get.name,
+            ping,
+            connection: {
+              host: this.memcachedModuleOptions.connection?.host || MEMCACHED_HOST,
+              port: this.memcachedModuleOptions.connection?.port || MEMCACHED_PORT,
+              options: this.memcachedModuleOptions.connection?.port || {},
+            },
+          });
+
+        throw new Error(`Connection issue`);
+      }
+
+      const cached = await this.memcachedClient.get(processedkey);
+
+      this.memcachedModuleOptions.log &&
+        this.logger?.debug('Cached data', {
+          fn: this.get.name,
+          key,
+          processedkey,
+          ttl,
+          ttr,
+          version,
+          prefix,
+          cached,
+        });
+
+      if (cached !== false) {
+        if (
+          options?.getProcessor?.disable !== true &&
+          this.memcachedModuleOptions.getProcessor?.disable !== true
+        ) {
+          cachedProcessedValue = options?.getProcessor?.fn
+            ? options?.getProcessor.fn(parse<ValueGetProcessorInput>(cached))
+            : this.getProcessor
+              ? this.getProcessor(parse<Cached>(cached))
+              : parse<Cached>(cached);
+        } else {
+          cachedProcessedValue = parse<Cached>(cached);
+        }
+      } else {
+        cachedProcessedValue = null;
+      }
+
+      this.memcachedModuleOptions.log &&
+        this.logger?.debug('Processed cached data', {
+          fn: this.get.name,
+          key,
+          processedkey,
+          ttl,
+          ttr,
+          version,
+          prefix,
+          cached,
+          cachedProcessedValue,
+        });
+
+      return cachedProcessedValue;
+    } catch (error) {
+      this.memcachedModuleOptions.log &&
+        this.logger?.error('Command "get" failed', {
+          fn: this.get.name,
+          error,
+        });
+
+      throw new MemcachedException({
+        message: 'Command "get" failed',
+        details: [(error as Error).message],
       });
-
-    const cached: T | undefined = await this.client.getAsync(processedKey);
-
-    this.memcachedModuleOptions.log &&
-      this.logger?.debug('Raw cached data', {
-        fn: this.get.name,
-        key,
-        processedKey,
-        cached,
-      });
-
-    return cached !== undefined
-      ? options?.superjson || this.memcachedModuleOptions.superjson
-        ? typeof cached === 'string'
-          ? this.parser.parse<T>(cached)
-          : cached
-        : cached
-      : null;
+    }
   }
 
-  /**
-   *
-   * * used to handle race conditions
-   * ! throws OperationalError if item already stored
-   */
-  async add<T>(key: string, value: T, options?: AddOptions): Promise<boolean> {
+  async set<Cached extends CachableValue, ValueSetProcessorOutput extends CachableValue = never>(
+    key: string,
+    value: Cached,
+    options?: [ValueSetProcessorOutput] extends [never]
+      ? OptionalLifetimesOption &
+          OptionalVersionOption &
+          OptionalPrefixOption &
+          OptionalKeyProcessorOption &
+          DisableSetProcessor
+      : OptionalLifetimesOption &
+          OptionalVersionOption &
+          OptionalPrefixOption &
+          OptionalKeyProcessorOption &
+          OptionalSetProcessorOption<Cached, ValueSetProcessorOutput>,
+  ): Promise<void>;
+
+  async set<
+    Cached extends CachableValue = CachableValue,
+    ValueSetProcessorOutput extends CachableValue = CachableValue,
+  >(
+    key: string,
+    value: Cached,
+    options?: OptionalLifetimesOption &
+      OptionalVersionOption &
+      OptionalPrefixOption &
+      OptionalKeyProcessorOption &
+      OptionalSetProcessorOption<Cached, ValueSetProcessorOutput>,
+  ): Promise<void> {
+    const { ttl, ttr } = options?.lifetimes
+      ? options?.lifetimes
+      : this.memcachedModuleOptions.lifetimes;
+
+    const version = options?.version ? options.version : this.memcachedModuleOptions.version;
+
+    const prefix = options?.prefix ? options.prefix : this.memcachedModuleOptions.prefix;
+
+    let processedKey: string;
+    let processedValue: Cached | ValueSetProcessorOutput | CachableValue;
+
     this.memcachedModuleOptions.log &&
       this.logger?.debug('Ready to eventually process key...', {
-        fn: this.add.name,
+        fn: this.set.name,
         key,
+        ttl,
+        ttr,
+        version,
+        prefix,
         value,
       });
 
-    const processedKey = options?.keyProcessor
-      ? options.keyProcessor(key)
-      : this.keyProcessor
-        ? this.keyProcessor(key)
-        : key;
+    try {
+      if (
+        options?.keyProcessor?.disable !== true &&
+        this.memcachedModuleOptions.keyProcessor?.disable !== true
+      ) {
+        const keyProcessorPayload = {
+          key,
+          ttl,
+          ...(ttr ? { ttr } : {}),
+          ...(version ? { version } : {}),
+          ...(prefix ? { prefix } : {}),
+        };
 
-    this.memcachedModuleOptions.log &&
-      this.logger?.debug('Ready to eventually serialize data...', {
-        fn: this.add.name,
-        key,
+        processedKey = options?.keyProcessor?.fn
+          ? options?.keyProcessor.fn(keyProcessorPayload)
+          : this.keyProcessor
+            ? this.keyProcessor(keyProcessorPayload)
+            : key;
+      } else {
+        processedKey = key;
+      }
+
+      this.memcachedModuleOptions.log &&
+        this.logger?.debug('Ready to eventually process value...', {
+          fn: this.set.name,
+          key,
+          processedKey,
+          ttl,
+          ttr,
+          version,
+          prefix,
+          value,
+        });
+
+      if (
+        options?.setProcessor?.disable !== true &&
+        this.memcachedModuleOptions.setProcessor?.disable !== true
+      ) {
+        const valueProcessorPayload: SetProcessorInput<Cached> = {
+          value,
+          ttl,
+          ...(ttr ? { ttr } : {}),
+          ...(version ? { version } : {}),
+          ...(prefix ? { prefix } : {}),
+        };
+
+        processedValue = options?.setProcessor?.fn
+          ? options?.setProcessor.fn(valueProcessorPayload)
+          : this.setProcessor
+            ? this.setProcessor(valueProcessorPayload)
+            : value;
+      } else {
+        processedValue = value;
+      }
+
+      this.memcachedModuleOptions.log &&
+        this.logger?.debug('Processed value', {
+          fn: this.set.name,
+          key,
+          processedKey,
+          ttl,
+          ttr,
+          version,
+          prefix,
+          value,
+          processedValue,
+        });
+
+      const ping = await this.memcachedClient.ping();
+
+      if (!ping) {
+        this.memcachedModuleOptions.log &&
+          this.logger?.error('Pre connection check failed', {
+            fn: this.set.name,
+            ping,
+            connection: {
+              host: this.memcachedModuleOptions.connection?.host || MEMCACHED_HOST,
+              port: this.memcachedModuleOptions.connection?.port || MEMCACHED_PORT,
+              options: this.memcachedModuleOptions.connection?.port || {},
+            },
+          });
+
+        throw new Error(`Connection issue`);
+      }
+
+      const setResult = await this.memcachedClient.set(
         processedKey,
-        value,
+        stringify(processedValue),
+        ttl,
+      );
+
+      if (!setResult) {
+        this.memcachedModuleOptions.log &&
+          this.logger?.error(
+            `Possible connection issue, underlying command "set" returned: ${setResult}`,
+            {
+              fn: this.set.name,
+              setResult,
+              connection: {
+                host: this.memcachedModuleOptions.connection?.host || MEMCACHED_HOST,
+                port: this.memcachedModuleOptions.connection?.port || MEMCACHED_PORT,
+                options: this.memcachedModuleOptions.connection?.port || {},
+              },
+              processedKey,
+              serializedProcessedValue: stringify(processedValue),
+              ttl,
+            },
+          );
+
+        throw new Error(
+          `Possible connection issue, underlying command "set" returned: ${setResult}`,
+        );
+      }
+    } catch (error) {
+      this.memcachedModuleOptions.log &&
+        this.logger?.error('Command "get" failed', {
+          fn: this.set.name,
+          error,
+        });
+
+      throw new MemcachedException({
+        message: 'Command "set" failed',
+        details: [(error as Error).message],
       });
-
-    const searialized =
-      (options?.superjson || this.memcachedModuleOptions.superjson) && typeof value !== 'number'
-        ? this.parser.stringify(value)
-        : value;
-
-    this.memcachedModuleOptions.log &&
-      this.logger?.debug('Ready to add data...', {
-        fn: this.add.name,
-        key,
-        processedKey,
-        value,
-        searialized,
-      });
-
-    return this.client.addAsync(
-      processedKey,
-      searialized,
-      options?.ttl || this.memcachedModuleOptions.ttl,
-    );
+    }
   }
 
-  /**
-   *
-   * * returns the current value after success increment
-   * ! returns false if key does not exists
-   * ! throws OperationalError if incr is applied to non numeric value
-   */
-  async incr(key: string, amount: number, options?: IncrDecrOptions): Promise<boolean | number> {
+  async ping(): Promise<void> {
     this.memcachedModuleOptions.log &&
-      this.logger?.debug('Ready to eventually process key...', {
-        fn: this.incr.name,
-        key,
-        amount,
+      this.logger?.debug('Pinging...', {
+        fn: this.ping.name,
       });
 
-    const processedKey = options?.keyProcessor
-      ? options.keyProcessor(key)
-      : this.keyProcessor
-        ? this.keyProcessor(key)
-        : key;
+    try {
+      const ping = await this.memcachedClient.ping();
 
-    this.memcachedModuleOptions.log &&
-      this.logger?.debug('Ready to incr...', {
-        fn: this.incr.name,
-        key,
-        processedKey,
-        amount,
+      if (!ping) {
+        this.memcachedModuleOptions.log &&
+          this.logger?.error('Connection issues', {
+            fn: this.ping.name,
+            ping,
+            connection: {
+              host: this.memcachedModuleOptions.connection?.host || MEMCACHED_HOST,
+              port: this.memcachedModuleOptions.connection?.port || MEMCACHED_PORT,
+              options: this.memcachedModuleOptions.connection?.port || {},
+            },
+          });
+
+        throw new Error('Connection issues');
+      }
+    } catch (error) {
+      this.memcachedModuleOptions.log &&
+        this.logger?.error('Error pinging', {
+          fn: this.ping.name,
+          error,
+        });
+
+      throw new MemcachedException({
+        message: 'Command "ping" failed',
+        details: [(error as Error).message],
       });
-
-    return this.client.incrAsync(processedKey, amount);
+    }
   }
 
-  /**
-   *
-   * * returns the current value after success increment
-   * * decr of 0 returns 0
-   * ! returns false if key does not exists
-   * ! throws OperationalError if incr is applied to non numeric value
-   */
-  async decr(key: string, amount: number, options?: IncrDecrOptions): Promise<boolean | number> {
-    this.memcachedModuleOptions.log &&
-      this.logger?.debug('Ready to eventually process key...', {
-        fn: this.decr.name,
-        key,
-        amount,
-      });
-
-    const processedKey = options?.keyProcessor
-      ? options.keyProcessor(key)
-      : this.keyProcessor
-        ? this.keyProcessor(key)
-        : key;
-
-    this.memcachedModuleOptions.log &&
-      this.logger?.debug('Ready to decr...', {
-        fn: this.decr.name,
-        key,
-        processedKey,
-        amount,
-      });
-
-    return this.client.decrAsync(processedKey, amount);
-  }
-
-  async del(key: string, options?: DelOptions): Promise<boolean> {
-    this.memcachedModuleOptions.log &&
-      this.logger?.debug('Ready to eventually process key...', {
-        fn: this.del.name,
-        key,
-      });
-
-    const processedKey = options?.keyProcessor
-      ? options.keyProcessor(key)
-      : this.keyProcessor
-        ? this.keyProcessor(key)
-        : key;
-
-    this.memcachedModuleOptions.log &&
-      this.logger?.debug('Ready to del...', {
-        fn: this.del.name,
-        key,
-        processedKey,
-      });
-
-    return this.client.delAsync(processedKey);
-  }
-
-  async flush(): Promise<boolean[]> {
+  async flush(): Promise<void> {
     this.memcachedModuleOptions.log &&
       this.logger?.debug('Flushing...', {
         fn: this.flush.name,
       });
 
-    return this.client.flushAsync();
+    try {
+      await this.memcachedClient.flush();
+    } catch (error) {
+      this.memcachedModuleOptions.log &&
+        this.logger?.error('Error flushing', {
+          fn: this.flush.name,
+          error,
+        });
+
+      throw new MemcachedException({
+        message: 'Command "flush" failed',
+        details: [(error as Error).message],
+      });
+    }
   }
 
-  end(): void {
+  async end(): Promise<void> {
     this.memcachedModuleOptions.log &&
       this.logger?.debug('Closing connection...', {
         fn: this.end.name,
       });
 
-    this.client.end();
+    try {
+      await this.memcachedClient.end();
+    } catch (error) {
+      this.memcachedModuleOptions.log &&
+        this.logger?.error('Error closing connection', {
+          fn: this.end.name,
+          error,
+        });
+
+      throw new MemcachedException({
+        message: 'Command "end" failed',
+        details: [(error as Error).message],
+      });
+    }
   }
 
-  onModuleDestroy(): void {
+  async onModuleDestroy(): Promise<void> {
     this.memcachedModuleOptions.log &&
-      this.logger?.debug('Closing connection...', {
+      this.logger?.debug('Destroying module...', {
         fn: this.onModuleDestroy.name,
       });
 
-    this.client.end();
+    try {
+      await this.memcachedClient.end();
+    } catch (error) {
+      this.memcachedModuleOptions.log &&
+        this.logger?.error('Error closing connection', {
+          fn: this.onModuleDestroy.name,
+          error,
+        });
+
+      throw new MemcachedException({
+        message: 'Command "end" failed',
+        details: [(error as Error).message],
+      });
+    }
   }
 }
