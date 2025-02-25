@@ -20,7 +20,7 @@ importers:
     devDependencies:
       '@andreafspeziale/nestjs-log':
         specifier: ^1.1.0
-        version: 1.1.0(@nestjs/common@10.4.15(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.8)(reflect-metadata@0.2.2)(rxjs@7.8.1)
+        version: 1.2.0(@nestjs/common@10.4.15(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.8)(reflect-metadata@0.2.2)(rxjs@7.8.1)
       '@commitlint/cli':
         specifier: ^19.3.0
         version: 19.7.1(@types/node@22.2.0)(typescript@5.7.3)
@@ -115,13 +115,13 @@ packages:
     resolution: {integrity: sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==}
     engines: {node: '>=6.0.0'}
 
-  '@andreafspeziale/nestjs-log@1.1.0':
-    resolution: {integrity: sha512-vH4R1HhvBNnX+TIPuuiShiW8FsGKHcVWqcEBURdTp8XzhXVYbI6JgxdF4qun4kMHvf+/kOU/wMzaPJeJ2ED0ow==}
+  '@andreafspeziale/nestjs-log@1.2.0':
+    resolution: {integrity: sha512-g5yb7v6DeomE+RgHBL6aPEDI6dq5hC/rlozXr24BQy0drNF8MjXY5o1OYhqOc0t25dcyMwj2GZLvw2Ct+1CHEw==}
     engines: {node: '>=20.16.0'}
     peerDependencies:
-      '@nestjs/common': ^10.0.0
-      '@nestjs/platform-express': ^10.0.0
-      '@nestjs/platform-fastify': ^10.0.0
+      '@nestjs/common': ^10.0.0 || ^11.0.0
+      '@nestjs/platform-express': ^10.0.0 || ^11.0.0
+      '@nestjs/platform-fastify': ^10.0.0 || ^11.0.0
       class-transformer: ^0.5.1
       class-validator: ^0.14.1
       joi: ^17.13.3
@@ -3855,7 +3855,7 @@ snapshots:
       '@jridgewell/gen-mapping': 0.3.5
       '@jridgewell/trace-mapping': 0.3.25
 
-  '@andreafspeziale/nestjs-log@1.1.0(@nestjs/common@10.4.15(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.8)(reflect-metadata@0.2.2)(rxjs@7.8.1)':
+  '@andreafspeziale/nestjs-log@1.2.0(@nestjs/common@10.4.15(reflect-metadata@0.2.2)(rxjs@7.8.1))(@nestjs/platform-express@10.4.8)(reflect-metadata@0.2.2)(rxjs@7.8.1)':
     dependencies:
       '@nestjs/common': 10.4.15(reflect-metadata@0.2.2)(rxjs@7.8.1)
       cls-rtracer: 2.6.3
