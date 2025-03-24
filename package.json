@@ -49,7 +49,7 @@
     "@nestjs/core": "^10.4.13",
     "@nestjs/testing": "^10.4.0",
     "@release-it/conventional-changelog": "8.0.2",
-    "@tsconfig/node20": "20.1.4",
+    "@tsconfig/node20": "20.1.5",
     "@tsconfig/recommended": "1.0.8",
     "@tsconfig/strictest": "2.0.5",
     "@types/bluebird": "3.5.42",
