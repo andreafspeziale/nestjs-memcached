@@ -2,7 +2,7 @@
 .github
 .husky
 /lib
-.eslintrc.js
+eslint.config.mjs
 .prettierrc
 .release-it.json
 compose*
