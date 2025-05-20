@@ -46,8 +46,8 @@ importers:
         specifier: ^10.0.0
         version: 10.0.1(conventional-commits-filter@5.0.0)(conventional-commits-parser@6.1.0)(release-it@18.1.2(@types/node@22.13.13)(typescript@5.8.3))
       '@tsconfig/node22':
-        specifier: 22.0.1
-        version: 22.0.1
+        specifier: 22.0.2
+        version: 22.0.2
       '@tsconfig/recommended':
         specifier: 1.0.8
         version: 1.0.8
@@ -855,8 +855,8 @@ packages:
   '@tootallnate/quickjs-emscripten@0.23.0':
     resolution: {integrity: sha512-C5Mc6rdnsaJDjO3UpGW/CQTHtCKaYlScZTly4JIu97Jxo/odCiH0ITnDXSJPTOrEKk/ycSZ0AOgTmkDtkOsvIA==}
 
-  '@tsconfig/node22@22.0.1':
-    resolution: {integrity: sha512-VkgOa3n6jvs1p+r3DiwBqeEwGAwEvnVCg/hIjiANl5IEcqP3G0u5m8cBJspe1t9qjZRlZ7WFgqq5bJrGdgAKMg==}
+  '@tsconfig/node22@22.0.2':
+    resolution: {integrity: sha512-Kmwj4u8sDRDrMYRoN9FDEcXD8UpBSaPQQ24Gz+Gamqfm7xxn+GBR7ge/Z7pK8OXNGyUzbSwJj+TH6B+DS/epyA==}
 
   '@tsconfig/recommended@1.0.8':
     resolution: {integrity: sha512-TotjFaaXveVUdsrXCdalyF6E5RyG6+7hHHQVZonQtdlk1rJZ1myDIvPUUKPhoYv+JAzThb2lQJh9+9ZfF46hsA==}
@@ -4587,7 +4587,7 @@ snapshots:
 
   '@tootallnate/quickjs-emscripten@0.23.0': {}
 
-  '@tsconfig/node22@22.0.1': {}
+  '@tsconfig/node22@22.0.2': {}
 
   '@tsconfig/recommended@1.0.8': {}
 
