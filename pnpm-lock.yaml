@@ -52,8 +52,8 @@ importers:
         specifier: 1.0.10
         version: 1.0.10
       '@tsconfig/strictest':
-        specifier: 2.0.5
-        version: 2.0.5
+        specifier: 2.0.6
+        version: 2.0.6
       '@types/bluebird':
         specifier: 3.5.42
         version: 3.5.42
@@ -865,8 +865,8 @@ packages:
   '@tsconfig/recommended@1.0.10':
     resolution: {integrity: sha512-cGvydvg03lONp5Z9yaplW493Vw9/um7k588mvDkm+VFPF2PZUVPx0uswq4PFpeEySsLbQRETrDRhzh4Dmxaslw==}
 
-  '@tsconfig/strictest@2.0.5':
-    resolution: {integrity: sha512-ec4tjL2Rr0pkZ5hww65c+EEPYwxOi4Ryv+0MtjeaSQRJyq322Q27eOQiFbuNgw2hpL4hB1/W/HBGk3VKS43osg==}
+  '@tsconfig/strictest@2.0.6':
+    resolution: {integrity: sha512-tPOhmDhIUcDjvpDDYyiUdssP84Eqm7n5KxJe5J3/g+s6xoDIPAf+SIn06dhw7VkhxIvLOnhDDrX7tsqMHNEhDg==}
 
   '@types/babel__core@7.20.5':
     resolution: {integrity: sha512-qoQprZvz5wQFJwMDqeseRXWv3rqMvhgpbXFfVyWhbx9X47POIA6i/+dXefEmZKoAgOaTdaIgNSMqMIU61yRyzA==}
@@ -4665,7 +4665,7 @@ snapshots:
 
   '@tsconfig/recommended@1.0.10': {}
 
-  '@tsconfig/strictest@2.0.5': {}
+  '@tsconfig/strictest@2.0.6': {}
 
   '@types/babel__core@7.20.5':
     dependencies:
