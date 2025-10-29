@@ -61,7 +61,7 @@
     "@nestjs/testing": "^11.0.11",
     "@release-it/conventional-changelog": "^10.0.0",
     "@tsconfig/node22": "22.0.2",
-    "@tsconfig/recommended": "1.0.10",
+    "@tsconfig/recommended": "1.0.11",
     "@tsconfig/strictest": "2.0.6",
     "@types/bluebird": "3.5.42",
     "@types/jest": "^29.5.14",
