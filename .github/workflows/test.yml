@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       memcached:
-        image: memcached:1.6.32-alpine3.20
+        image: memcached:1.6.33-alpine3.20
         ports:
           - 11211:11211
     steps:
@@ -18,11 +18,11 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 22.11.0
+          node-version: 24.14.0
       - name: Install pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 9
+          version: 10
           run_install: false
       - name: Get pnpm store directory
         id: pnpm-cache
@@ -38,7 +38,9 @@ jobs:
             ${{ runner.os }}-pnpm-store-
       - name: Install dependencies
         run: pnpm install
+      - name: Types
+        run: pnpm build:check
       - name: Lint
-        run: pnpm lint
+        run: pnpm lint:check
       - name: Test
         run: pnpm test

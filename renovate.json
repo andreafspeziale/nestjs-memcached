@@ -1,14 +1,12 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "semanticCommits": "enabled",
+  "automerge": true,
   "packageRules": [
     {
       "matchUpdateTypes": ["major"],
-      "dependencyDashboardApproval": true
-    },
-    {
-      "matchDepTypes": ["devDependencies"],
-      "automerge": true
+      "dependencyDashboardApproval": true,
+      "automerge": false
     }
   ],
   "extends": [

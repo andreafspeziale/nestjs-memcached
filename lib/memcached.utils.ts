@@ -11,19 +11,19 @@ export const getMemcachedClientToken = (): string => MEMCACHED_CLIENT_TOKEN;
 export const getMemcachedLoggerToken = (): string => MEMCACHED_LOGGER_TOKEN;
 
 export const createMemcachedClient = ({
-  connections = [],
+  connections,
 }: Pick<MemcachedModuleOptions, 'connections'>): MemcachedClient =>
   Array.isArray(connections)
     ? new Memcached(
         connections.map((c) => (c.port ? `${c.host}:${c.port}` : `${c.host}`)).join(','),
       )
     : new Memcached(
-        connections.locations
+        connections?.locations
           ? connections.locations
               .map((c) => (c.port ? `${c.host}:${c.port}` : `${c.host}`))
               .join(',')
           : [],
-        connections.options,
+        connections?.options,
       );
 
 export const defaultWrapperProcessor: WrapperProcessor = ({ value, ttl, ttr }) => ({

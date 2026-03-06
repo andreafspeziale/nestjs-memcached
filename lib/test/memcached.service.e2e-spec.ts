@@ -116,22 +116,30 @@ describe('MemcachedService (e2e)', () => {
           >('key');
 
           expect(cached?.ttl).toBe(options.ttl);
-          options.ttr ? expect(cached?.ttr).toBe(options.ttr) : expect(cached?.ttr).toBeUndefined();
+          if (options.ttr) {
+            expect(cached?.ttr).toBe(options.ttr);
+          } else {
+            expect(cached?.ttr).toBeUndefined();
+          }
           expect(cached?.content).toBe('value');
 
           if (options.wrapperProcessor) {
             expect(cached?.createdAt).toBeDefined();
-            options.superjson
-              ? expect(cached?.createdAt).toBeInstanceOf(Date)
-              : expect(typeof cached?.createdAt).toBe('string');
+            if (options.superjson) {
+              expect(cached?.createdAt).toBeInstanceOf(Date);
+            } else {
+              expect(typeof cached?.createdAt).toBe('string');
+            }
           }
 
-          options.log
-            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
-                LOGGER_INVOCATION_BY_API_COUNT_MAP['setWithMeta'] +
-                  LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
-              )
-            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          if (options.log) {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+              LOGGER_INVOCATION_BY_API_COUNT_MAP['setWithMeta'] +
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
+            );
+          } else {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          }
         });
 
         it('Should return the value of the cached key/value pair with override keyProcessor', async () => {
@@ -148,22 +156,31 @@ describe('MemcachedService (e2e)', () => {
           });
 
           expect(cached?.ttl).toBe(options.ttl);
-          options.ttr ? expect(cached?.ttr).toBe(options.ttr) : expect(cached?.ttr).toBeUndefined();
+          if (options.ttr) {
+            expect(cached?.ttr).toBe(options.ttr);
+          } else {
+            expect(cached?.ttr).toBeUndefined();
+          }
+
           expect(cached?.content).toBe('value');
 
           if (options.wrapperProcessor) {
             expect(cached?.createdAt).toBeDefined();
-            options.superjson
-              ? expect(cached?.createdAt).toBeInstanceOf(Date)
-              : expect(typeof cached?.createdAt).toBe('string');
+            if (options.superjson) {
+              expect(cached?.createdAt).toBeInstanceOf(Date);
+            } else {
+              expect(typeof cached?.createdAt).toBe('string');
+            }
           }
 
-          options.log
-            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
-                LOGGER_INVOCATION_BY_API_COUNT_MAP['setWithMeta'] +
-                  LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
-              )
-            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          if (options.log) {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+              LOGGER_INVOCATION_BY_API_COUNT_MAP['setWithMeta'] +
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
+            );
+          } else {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          }
         });
 
         it('Should return the value of the cached key/value pair along with specified ttl', async () => {
@@ -176,22 +193,31 @@ describe('MemcachedService (e2e)', () => {
           >('key');
 
           expect(cached?.ttl).toBe(100);
-          options.ttr ? expect(cached?.ttr).toBe(options.ttr) : expect(cached?.ttr).toBeUndefined();
+          if (options.ttr) {
+            expect(cached?.ttr).toBe(options.ttr);
+          } else {
+            expect(cached?.ttr).toBeUndefined();
+          }
+
           expect(cached?.content).toBe('value');
 
           if (options.wrapperProcessor) {
             expect(cached?.createdAt).toBeDefined();
-            options.superjson
-              ? expect(cached?.createdAt).toBeInstanceOf(Date)
-              : expect(typeof cached?.createdAt).toBe('string');
+            if (options.superjson) {
+              expect(cached?.createdAt).toBeInstanceOf(Date);
+            } else {
+              expect(typeof cached?.createdAt).toBe('string');
+            }
           }
 
-          options.log
-            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
-                LOGGER_INVOCATION_BY_API_COUNT_MAP['setWithMeta'] +
-                  LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
-              )
-            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          if (options.log) {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+              LOGGER_INVOCATION_BY_API_COUNT_MAP['setWithMeta'] +
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
+            );
+          } else {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          }
         });
 
         it('Should return the value of the cached key/value pair along with specified ttl and ttr', async () => {
@@ -212,17 +238,21 @@ describe('MemcachedService (e2e)', () => {
 
           if (options.wrapperProcessor) {
             expect(cached?.createdAt).toBeDefined();
-            options.superjson
-              ? expect(cached?.createdAt).toBeInstanceOf(Date)
-              : expect(typeof cached?.createdAt).toBe('string');
+            if (options.superjson) {
+              expect(cached?.createdAt).toBeInstanceOf(Date);
+            } else {
+              expect(typeof cached?.createdAt).toBe('string');
+            }
           }
 
-          options.log
-            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
-                LOGGER_INVOCATION_BY_API_COUNT_MAP['setWithMeta'] +
-                  LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
-              )
-            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          if (options.log) {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+              LOGGER_INVOCATION_BY_API_COUNT_MAP['setWithMeta'] +
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
+            );
+          } else {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          }
         });
 
         it('Should return the value of the cached key/value with override wrapperProcessor', async () => {
@@ -253,12 +283,14 @@ describe('MemcachedService (e2e)', () => {
           expect(cached?.test).toBeDefined();
           expect(cached?.test).toBe('test');
 
-          options.log
-            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
-                LOGGER_INVOCATION_BY_API_COUNT_MAP['setWithMeta'] +
-                  LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
-              )
-            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          if (options.log) {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+              LOGGER_INVOCATION_BY_API_COUNT_MAP['setWithMeta'] +
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
+            );
+          } else {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          }
         });
 
         it('Should return the value of the cached key/value pair as complex object', async () => {
@@ -279,31 +311,40 @@ describe('MemcachedService (e2e)', () => {
           const {
             content: { property, list, date },
             ...rest
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           } = cached!;
 
           expect(rest.ttl).toBe(options.ttl);
-          options.ttr ? expect(rest.ttr).toBe(options.ttr) : expect(rest.ttr).toBeUndefined();
+          if (options.ttr) {
+            expect(rest.ttr).toBe(options.ttr);
+          } else {
+            expect(rest.ttr).toBeUndefined();
+          }
 
           expect(property).toBe(data.property);
           expect(list).toEqual(data.list);
-          options.superjson
-            ? expect(date).toBeInstanceOf(Date)
-            : expect(typeof date).toBe('string');
+          if (options.superjson) {
+            expect(date).toBeInstanceOf(Date);
+          } else {
+            expect(typeof date).toBe('string');
+          }
 
           if (options.wrapperProcessor) {
             expect(cached?.createdAt).toBeDefined();
-            options.superjson
-              ? expect(cached?.createdAt).toBeInstanceOf(Date)
-              : expect(typeof cached?.createdAt).toBe('string');
+            if (options.superjson) {
+              expect(cached?.createdAt).toBeInstanceOf(Date);
+            } else {
+              expect(typeof cached?.createdAt).toBe('string');
+            }
           }
 
-          options.log
-            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
-                LOGGER_INVOCATION_BY_API_COUNT_MAP['setWithMeta'] +
-                  LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
-              )
-            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          if (options.log) {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+              LOGGER_INVOCATION_BY_API_COUNT_MAP['setWithMeta'] +
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
+            );
+          } else {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          }
         });
       });
 
@@ -317,12 +358,13 @@ describe('MemcachedService (e2e)', () => {
 
           expect(cached).toBe('value');
 
-          options.log
-            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
-                LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] +
-                  LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
-              )
-            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          if (options.log) {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+              LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] + LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
+            );
+          } else {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          }
         });
 
         it('Should return the value of the cached key/value with override keyProcessor', async () => {
@@ -338,28 +380,32 @@ describe('MemcachedService (e2e)', () => {
 
           expect(cached).toBe('value');
 
-          options.log
-            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
-                LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] +
-                  LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
-              )
-            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          if (options.log) {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+              LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] + LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
+            );
+          } else {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          }
         });
 
         it('Should return a Date object only if superjson is active', async () => {
           await memcachedService.set('key', new Date());
           const result = await memcachedService.get('key');
 
-          options.superjson
-            ? expect(result).toBeInstanceOf(Date)
-            : expect(typeof result).toBe('string');
+          if (options.superjson) {
+            expect(result).toBeInstanceOf(Date);
+          } else {
+            expect(typeof result).toBe('string');
+          }
 
-          options.log
-            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
-                LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] +
-                  LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
-              )
-            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          if (options.log) {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+              LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] + LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
+            );
+          } else {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          }
         });
 
         it('Should always return a number when set', async () => {
@@ -368,9 +414,11 @@ describe('MemcachedService (e2e)', () => {
 
           expect(result).toBe(1);
 
-          options.log
-            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(3 + 3)
-            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          if (options.log) {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(3 + 3);
+          } else {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          }
         });
 
         it('Should return the value of the cached key/value pair as complex object', async () => {
@@ -388,25 +436,23 @@ describe('MemcachedService (e2e)', () => {
             Omit<typeof data, 'date'> & { date: Date | string }
           >('key');
 
-          const {
-            property,
-            list,
-            date,
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          } = cached!;
+          const { property, list, date } = cached!;
 
           expect(property).toBe(data.property);
           expect(list).toEqual(data.list);
-          options.superjson
-            ? expect(date).toBeInstanceOf(Date)
-            : expect(typeof date).toBe('string');
+          if (options.superjson) {
+            expect(date).toBeInstanceOf(Date);
+          } else {
+            expect(typeof date).toBe('string');
+          }
 
-          options.log
-            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
-                LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] +
-                  LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
-              )
-            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          if (options.log) {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+              LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] + LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
+            );
+          } else {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          }
         });
 
         it('Should return null', async () => {
@@ -414,11 +460,13 @@ describe('MemcachedService (e2e)', () => {
 
           expect(cached).toBe(null);
 
-          options.log
-            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
-                LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
-              )
-            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          if (options.log) {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+              LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
+            );
+          } else {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          }
         });
       });
 
@@ -432,12 +480,13 @@ describe('MemcachedService (e2e)', () => {
 
           expect(cached).toBe('value');
 
-          options.log
-            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
-                LOGGER_INVOCATION_BY_API_COUNT_MAP['add'] +
-                  LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
-              )
-            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          if (options.log) {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+              LOGGER_INVOCATION_BY_API_COUNT_MAP['add'] + LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
+            );
+          } else {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          }
         });
 
         it('Should return the value of the cached key/value with override keyProcessor', async () => {
@@ -453,28 +502,32 @@ describe('MemcachedService (e2e)', () => {
 
           expect(cached).toBe('value');
 
-          options.log
-            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
-                LOGGER_INVOCATION_BY_API_COUNT_MAP['add'] +
-                  LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
-              )
-            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          if (options.log) {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+              LOGGER_INVOCATION_BY_API_COUNT_MAP['add'] + LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
+            );
+          } else {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          }
         });
 
         it('Should return a Date object only if superjson is active', async () => {
           await memcachedService.add('key', new Date());
           const result = await memcachedService.get('key');
 
-          options.superjson
-            ? expect(result).toBeInstanceOf(Date)
-            : expect(typeof result).toBe('string');
+          if (options.superjson) {
+            expect(result).toBeInstanceOf(Date);
+          } else {
+            expect(typeof result).toBe('string');
+          }
 
-          options.log
-            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
-                LOGGER_INVOCATION_BY_API_COUNT_MAP['add'] +
-                  LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
-              )
-            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          if (options.log) {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+              LOGGER_INVOCATION_BY_API_COUNT_MAP['add'] + LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
+            );
+          } else {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          }
         });
 
         it('Should always return a number when set', async () => {
@@ -483,12 +536,13 @@ describe('MemcachedService (e2e)', () => {
 
           expect(result).toBe(1);
 
-          options.log
-            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
-                LOGGER_INVOCATION_BY_API_COUNT_MAP['add'] +
-                  LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
-              )
-            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          if (options.log) {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+              LOGGER_INVOCATION_BY_API_COUNT_MAP['add'] + LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
+            );
+          } else {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          }
         });
 
         it('Should return the value of the cached key/value pair as complex object', async () => {
@@ -506,25 +560,23 @@ describe('MemcachedService (e2e)', () => {
             Omit<typeof data, 'date'> & { date: Date | string }
           >('key');
 
-          const {
-            property,
-            list,
-            date,
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          } = cached!;
+          const { property, list, date } = cached!;
 
           expect(property).toBe(data.property);
           expect(list).toEqual(data.list);
-          options.superjson
-            ? expect(date).toBeInstanceOf(Date)
-            : expect(typeof date).toBe('string');
+          if (options.superjson) {
+            expect(date).toBeInstanceOf(Date);
+          } else {
+            expect(typeof date).toBe('string');
+          }
 
-          options.log
-            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
-                LOGGER_INVOCATION_BY_API_COUNT_MAP['add'] +
-                  LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
-              )
-            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          if (options.log) {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+              LOGGER_INVOCATION_BY_API_COUNT_MAP['add'] + LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
+            );
+          } else {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          }
         });
 
         it('Should return false if cached key/value pair already exists', async () => {
@@ -536,12 +588,13 @@ describe('MemcachedService (e2e)', () => {
             cause: new Error('Item is not stored'),
           });
 
-          options.log
-            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
-                LOGGER_INVOCATION_BY_API_COUNT_MAP['add'] +
-                  LOGGER_INVOCATION_BY_API_COUNT_MAP['add'],
-              )
-            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          if (options.log) {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+              LOGGER_INVOCATION_BY_API_COUNT_MAP['add'] + LOGGER_INVOCATION_BY_API_COUNT_MAP['add'],
+            );
+          } else {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          }
         });
       });
 
@@ -556,12 +609,14 @@ describe('MemcachedService (e2e)', () => {
 
           expect(result).toBe(curr + incr);
 
-          options.log
-            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
-                LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] +
-                  LOGGER_INVOCATION_BY_API_COUNT_MAP['incr'],
-              )
-            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          if (options.log) {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+              LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] +
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['incr'],
+            );
+          } else {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          }
         });
 
         it('Should correclty increment the key numeric value with override keyProcessor', async () => {
@@ -578,12 +633,14 @@ describe('MemcachedService (e2e)', () => {
 
           expect(result).toBe(curr + incr);
 
-          options.log
-            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
-                LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] +
-                  LOGGER_INVOCATION_BY_API_COUNT_MAP['incr'],
-              )
-            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          if (options.log) {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+              LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] +
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['incr'],
+            );
+          } else {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          }
         });
 
         it('Should return false since key has never been set as whatever', async () => {
@@ -591,11 +648,13 @@ describe('MemcachedService (e2e)', () => {
 
           expect(result).toBe(false);
 
-          options.log
-            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
-                LOGGER_INVOCATION_BY_API_COUNT_MAP['incr'],
-              )
-            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          if (options.log) {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+              LOGGER_INVOCATION_BY_API_COUNT_MAP['incr'],
+            );
+          } else {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          }
         });
 
         it('Should throw Error if key value is set but not numeric', async () => {
@@ -607,12 +666,14 @@ describe('MemcachedService (e2e)', () => {
             cause: new Error('cannot increment or decrement non-numeric value'),
           });
 
-          options.log
-            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
-                LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] +
-                  LOGGER_INVOCATION_BY_API_COUNT_MAP['incr'],
-              )
-            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          if (options.log) {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+              LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] +
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['incr'],
+            );
+          } else {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          }
         });
       });
 
@@ -628,13 +689,15 @@ describe('MemcachedService (e2e)', () => {
 
           expect(result).toBe(curr + incr);
 
-          options.log
-            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
-                LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] +
-                  LOGGER_INVOCATION_BY_API_COUNT_MAP['incr'] +
-                  LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
-              )
-            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          if (options.log) {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+              LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] +
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['incr'] +
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
+            );
+          } else {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          }
         });
       });
 
@@ -649,12 +712,14 @@ describe('MemcachedService (e2e)', () => {
 
           expect(result).toBe(curr - decr);
 
-          options.log
-            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
-                LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] +
-                  LOGGER_INVOCATION_BY_API_COUNT_MAP['decr'],
-              )
-            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          if (options.log) {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+              LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] +
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['decr'],
+            );
+          } else {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          }
         });
 
         it('Should correclty decrement returning 0 even if decrement goes negative', async () => {
@@ -667,12 +732,14 @@ describe('MemcachedService (e2e)', () => {
 
           expect(result).toBe(0);
 
-          options.log
-            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
-                LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] +
-                  LOGGER_INVOCATION_BY_API_COUNT_MAP['decr'],
-              )
-            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          if (options.log) {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+              LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] +
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['decr'],
+            );
+          } else {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          }
         });
 
         it('Should correclty decrement the key numeric value with override keyProcessor', async () => {
@@ -689,12 +756,14 @@ describe('MemcachedService (e2e)', () => {
 
           expect(result).toBe(curr - decr);
 
-          options.log
-            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
-                LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] +
-                  LOGGER_INVOCATION_BY_API_COUNT_MAP['decr'],
-              )
-            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          if (options.log) {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+              LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] +
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['decr'],
+            );
+          } else {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          }
         });
 
         it('Should return 0 if try to decrement from 0', async () => {
@@ -707,12 +776,14 @@ describe('MemcachedService (e2e)', () => {
 
           expect(result).toBe(curr);
 
-          options.log
-            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
-                LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] +
-                  LOGGER_INVOCATION_BY_API_COUNT_MAP['decr'],
-              )
-            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          if (options.log) {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+              LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] +
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['decr'],
+            );
+          } else {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          }
         });
 
         it('Should return false since key has never been set as whatever', async () => {
@@ -720,11 +791,13 @@ describe('MemcachedService (e2e)', () => {
 
           expect(result).toBe(false);
 
-          options.log
-            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
-                LOGGER_INVOCATION_BY_API_COUNT_MAP['decr'],
-              )
-            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          if (options.log) {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+              LOGGER_INVOCATION_BY_API_COUNT_MAP['decr'],
+            );
+          } else {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          }
         });
 
         it('Should throw Error if key value is set but not numeric', async () => {
@@ -736,12 +809,14 @@ describe('MemcachedService (e2e)', () => {
             cause: new Error('cannot increment or decrement non-numeric value'),
           });
 
-          options.log
-            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
-                LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] +
-                  LOGGER_INVOCATION_BY_API_COUNT_MAP['decr'],
-              )
-            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          if (options.log) {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+              LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] +
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['decr'],
+            );
+          } else {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          }
         });
       });
 
@@ -757,13 +832,15 @@ describe('MemcachedService (e2e)', () => {
 
           expect(result).toBe(curr - decr);
 
-          options.log
-            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
-                LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] +
-                  LOGGER_INVOCATION_BY_API_COUNT_MAP['decr'] +
-                  LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
-              )
-            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          if (options.log) {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+              LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] +
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['decr'] +
+                LOGGER_INVOCATION_BY_API_COUNT_MAP['get'],
+            );
+          } else {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          }
         });
       });
 
@@ -775,12 +852,13 @@ describe('MemcachedService (e2e)', () => {
 
           expect(deleted).toBe(true);
 
-          options.log
-            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
-                LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] +
-                  LOGGER_INVOCATION_BY_API_COUNT_MAP['del'],
-              )
-            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          if (options.log) {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+              LOGGER_INVOCATION_BY_API_COUNT_MAP['set'] + LOGGER_INVOCATION_BY_API_COUNT_MAP['del'],
+            );
+          } else {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          }
         });
 
         it('Should return false since key/value has never been cached', async () => {
@@ -788,11 +866,13 @@ describe('MemcachedService (e2e)', () => {
 
           expect(deleted).toBe(false);
 
-          options.log
-            ? expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
-                LOGGER_INVOCATION_BY_API_COUNT_MAP['del'],
-              )
-            : expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          if (options.log) {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(
+              LOGGER_INVOCATION_BY_API_COUNT_MAP['del'],
+            );
+          } else {
+            expect(loggerDebugMethodSpy).toHaveBeenCalledTimes(0);
+          }
         });
       });
 
