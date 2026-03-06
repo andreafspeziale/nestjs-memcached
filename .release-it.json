@@ -7,6 +7,7 @@
     "release": true
   },
   "npm": {
+    "publish": true,
     "skipChecks": true
   },
   "plugins": {
@@ -18,6 +19,10 @@
           {
             "type": "feat",
             "section": "Features"
+          },
+          {
+            "type": "refactor",
+            "section": "Refactors"
           },
           {
             "type": "fix",
