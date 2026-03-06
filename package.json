@@ -60,7 +60,7 @@
     "@nestjs/core": "^11.0.11",
     "@nestjs/testing": "^11.0.11",
     "@release-it/conventional-changelog": "^10.0.0",
-    "@tsconfig/node22": "22.0.5",
+    "@tsconfig/node24": "24.0.0",
     "@tsconfig/recommended": "1.0.13",
     "@tsconfig/strictest": "2.0.8",
     "@types/bluebird": "3.5.42",
