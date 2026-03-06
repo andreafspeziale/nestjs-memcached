@@ -101,7 +101,10 @@
   "packageManager": "pnpm@10.30.3",
   "pnpm": {
     "overrides": {
-      "conventional-changelog-conventionalcommits": "8.0.0"
+      "conventional-changelog-conventionalcommits": "8.0.0",
+      "basic-ftp": ">=5.2.0",
+      "minimatch": ">=10.2.3",
+      "@babel/helpers": ">=7.26.10"
     }
   }
 }
