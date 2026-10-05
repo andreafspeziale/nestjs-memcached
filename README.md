@@ -6,9 +6,9 @@
     <img src="./assets/memcached-logo.png" width="160" alt="Memcached Logo" />
     <b></b>
     <!-- <a href="https://nestjs.com/" target="blank">
-      <img src="https://nestjs.com/img/logo_text.svg" width="320" alt="Nest Logo" />
+      <img src="./assets/nest-logo.svg" width="320" alt="Nest Logo" />
     </a> -->
-    <img src="https://nestjs.com/img/logo_text.svg" width="320" alt="Nest Logo" />
+    <img src="./assets/nest-logo.svg" width="320" alt="Nest Logo" />
   </p>
   <p>
     <a href="https://memcached.org/" target="blank">Memcached</a> module and service for <a href="https://github.com/nestjs/nest" target="blank">Nest</a>,<br>
